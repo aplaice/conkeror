@@ -105,7 +105,7 @@ command_line_param_handler("f", true, function (command, ctx) {
         ctx.window = get_recent_conkeror_window();
         if (ctx.window)
             ctx.buffer = ctx.window.buffers.current;
-        co_call(call_interactively(ctx, command));
+        call_interactively(ctx, command);
     });
 
 command_line_param_handler("l", false, function (path, ctx) {
@@ -123,7 +123,7 @@ command_line_handler("u", false, function (ctx) {
             ctx.window = get_recent_conkeror_window();
             ctx.buffer = ctx.window.buffers.current;
         }
-        co_call(call_interactively(ctx, "universal-argument"));
+        call_interactively(ctx, "universal-argument");
     });
 
 function handle_command_line (cmdline) {

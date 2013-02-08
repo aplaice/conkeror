@@ -29,6 +29,7 @@ function minibuffer_message_state (minibuffer, keymap, message, cleanup_function
     minibuffer_state.call(this, minibuffer, keymap);
     this._message = message;
     this.cleanup_function = cleanup_function;
+    this.loaded = false;
 }
 minibuffer_message_state.prototype = {
     constructor: minibuffer_message_state,
@@ -36,12 +37,19 @@ minibuffer_message_state.prototype = {
     _message: null,
     get message () { return this._message; },
     set message (x) {
-        this.minibuffer._restore_normal_state();
-        this.minibuffer._show(this._message);
+        if (this.loaded) {
+            this.minibuffer._restore_normal_state();
+            this.minibuffer._show(this._message);
+        }
     },
     load: function () {
         minibuffer_state.prototype.load.call(this);
         this.minibuffer._show(this.message);
+        this.loaded = true;
+    },
+    unload: function () {
+        this.loaded = false;
+        minibuffer_state.prototype.unload.call(this);
     },
     cleanup_function: null,
     destroy: function () {
@@ -71,7 +79,6 @@ function minibuffer_input_state (minibuffer, keymap, prompt, input, selection_st
         this.selection_end = selection_end;
     else
         this.selection_end = this.selection_start;
-    this.minibuffer.window.input.begin_recursion();
 }
 minibuffer_input_state.prototype = {
     constructor: minibuffer_input_state,
@@ -94,7 +101,6 @@ minibuffer_input_state.prototype = {
         minibuffer_state.prototype.unload.call(this);
     },
     destroy: function () {
-        this.minibuffer.window.input.end_recursion();
         minibuffer_state.prototype.destroy.call(this);
     }
 };
@@ -276,8 +282,6 @@ minibuffer.prototype = {
         }
     },
 
-    //XXX: breaking stack discipline can cause incorrect
-    //     input recursion termination
     remove_state: function (state) {
         var i = this.states.indexOf(state);
         if (i == -1)
@@ -427,7 +431,6 @@ function minibuffer_abort (window) {
     if (s == null)
         throw "Invalid minibuffer state";
     m.pop_state();
-    input_sequence_abort.call(window);
 }
 interactive("minibuffer-abort", null, function (I) { minibuffer_abort(I.window); });
 

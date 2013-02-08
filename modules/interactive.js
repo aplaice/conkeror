@@ -81,46 +81,49 @@ function handle_interactive_error (window, e) {
     }
 }
 
-function call_interactively (I, command) {
+// Coroutine that runs an interactive command synchronously.
+// Returns true if prefix command, returns false otherwise.
+// Exceptions are allowed to pass through.
+function run_interactively (I, command) {
     var handler;
     var window = I.window;
 
     if (typeof command == "function") {
         // Special interactive command
-        command(I);
-        yield co_return();
+        yield command(I);
+        yield co_return(false);
     }
 
     var cmd = interactive_commands[command];
-    if (!cmd) {
-        handle_interactive_error(
-            window,
-            interactive_error("Invalid command: " + command));
-        yield co_return();
-    }
+    if (!cmd)
+        throw interactive_error("Invalid command: " + command);
 
     I.command = cmd;
     handler = cmd.handler;
 
-    try {
-        while (typeof handler == "string") {
-            let parent = interactive_commands[handler];
-            handler = parent.handler;
-            if (handler == command) {
-                throw (interactive_error("circular command alias, "+command));
-            }
+    while (typeof handler == "string") {
+        let parent = interactive_commands[handler];
+        handler = parent.handler;
+        if (handler == command) {
+            throw interactive_error("circular command alias: " + command);
         }
-
-        try {
-            yield handler(I);
-        } catch (e) {
-            handle_interactive_error(window, e);
-        }
-    } catch (e) {
-        handle_interactive_error(window, e);
     }
+
+    yield handler(I);
+
+    yield co_return(cmd.prefix ? true : false);
 }
 
+
+function call_interactively (I, command) {
+    co_call(function () {
+        try {
+            yield run_interactively(I, command);
+        } catch (e) {
+            handle_interactive_error(I.window, e);
+        }
+    }());
+}
 
 function alternates () {
     let alts = Array.prototype.slice.call(arguments, 0);

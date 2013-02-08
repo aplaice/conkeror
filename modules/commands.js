@@ -140,6 +140,7 @@ interactive("execute-extended-command",
         var prompt = "M-x";
         if (I.key_sequence)
             prompt = I.key_sequence.join(" ");
+        // FIXME: boc and prefix handling results in adding information that may be redundant with key sequence
         if (boc)
             prompt += ' ['+boc.name+']';
         if (prefix !== null && prefix !== undefined) {
@@ -149,11 +150,13 @@ interactive("execute-extended-command",
                 prompt += " "+prefix;
         }
         var command = yield I.minibuffer.read_command($prompt = prompt);
-        call_after_timeout(function () {
-            input_handle_command.call(I.window, new command_event(command));
-        }, 0);
-    },
-    $prefix = true);
+        if (I.key_sequence) {
+            I.key_sequence.push(command);
+        }
+
+        // Because we are not a prefix command, re-entering the input system is okay, and we can run the command immediately
+        input_run_command(I, command);
+    });
 
 
 /// built in commands
@@ -322,7 +325,8 @@ function view_mathml_source (window, charset, target) {
                              null, charset, target, 'mathml');
 }
 
-
+// Warning: event handler will be run before this function returns
+// You should verify that this won't produce unexpected results
 function send_key_as_event (window, element, combo) {
     var split = unformat_key_combo(combo);
     var event = window.document.createEvent("KeyboardEvent");

@@ -15,11 +15,7 @@ function global_overlay_keymap_handler (window, I, true_event) {
     var binding = keymap_lookup([global_overlay_keymap], I.combo, I.event);
     if (!binding)
         return false;
-    if (!binding.fallthrough)
-        event_kill(true_event);
-    I.key_sequence.pop();
-    if (binding.command)
-        co_call(call_interactively(I, binding.command));
+    input_handle_binding(I, true_event, binding);
     return true;
 }
 
@@ -35,14 +31,19 @@ define_global_mode("global_overlay_keymap_mode",
 
 function define_key_alias (typed_key, generated_key) {
     var name = "generate-key-event:"+generated_key;
+
+    // This is not a prefix command, because we need finer-grained control over the input state.
     interactive(name,
         "Generate a fake key press event for the key: "+generated_key,
         function (I) {
-            call_after_timeout(function () {
-                send_key_as_event(I.window,
-                                  I.buffer.focused_element,
-                                  generated_key);
-            }, 0);
+            // Effectively leave the input state almost exactly as it was prior to this key event
+            if (!I.first_event)
+                input_continue_with_state(I);
+
+            // Warning: event handler is called before send_key_as_event returns
+            send_key_as_event(I.window,
+                              I.buffer.focused_element,
+                              generated_key);
         });
     define_key(global_overlay_keymap, typed_key, name);
     global_overlay_keymap_mode(true);
@@ -55,7 +56,7 @@ function define_sticky_modifier (typed_key, modifiers) {
     interactive(name, "Set sticky modifiers: "+modifiers,
                 function (I) {
                     I.sticky_modifiers = modifiers;
-                });
+                }, $prefix);
     define_key(global_overlay_keymap, typed_key, name);
     global_overlay_keymap_mode(true);
 }

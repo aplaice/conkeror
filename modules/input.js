@@ -54,79 +54,97 @@ function event_kill (event) {
     event.stopPropagation();
 }
 
-
 /**
- * command_event is a special event type that tells input_handle_sequence
- * to run the given command.
- */
-function command_event (command) {
-    this.type = "command";
-    this.command = command;
-}
-
-
-/**
- * input_state makes an object that holds the state of a single key sequence.
- * As a small measure of efficiency, these objects get recycled from one
- * sequence to the next.
- */
-function input_state () {
+ * window_input_state encapsulates all of the per-window data for the input system
+ **/
+function window_input_state () {
+    /**
+     * Maps keycodes to true to indicate that the next keyup event for that key
+     * should be allowed to fall through.  This is a global property, since once
+     * the keydown is received, the keyup could occur at any time.
+     **/
     this.fallthrough = {};
+
+    /**
+     * There is at most one current input context.
+     *
+     * If this is non-null, it is an interactive_context object created by
+     * input_make_interactive_context.
+     **/
+    this.current_context = null;
+
+    /**
+     * timer ID for current delayed display of key sequence help
+     **/
+    this.help_timer = null;
 }
-input_state.prototype = {
-    constructor: input_state,
-    continuation: null,
-    fallthrough: null
-};
 
+function input_make_interactive_context (window) {
+    var I = new interactive_context(window.buffers.current);
 
-/**
- * input_stack is a stack of input_states, which is to say a stack of
- * recursed sequences.  input recursion happens, for example, when a
- * minibuffer read takes place in the middle of another sequence.
- */
-function input_stack () {
-    this.array = [new input_state()];
+    I.key_sequence = [];
+
+    I.sticky_modifiers = 0;
+
+    /**
+     * Initial keymap at 
+     **/
+    I.initial_keymaps = get_current_keymaps(window);
+
+    /**
+     * Indicates if this interactive context was created due to this event.  For
+     * special key handling, this is useful for determining whether to call
+     * input_continue_with_state or not.
+     **/
+    I.first_event = true;
+
+    /**
+     * Current keymap
+     **/
+    I.keymaps = I.initial_keymaps;
+
+    /**
+     * Additional overlay keymap
+     **/
+    I.overlay_keymap = null;
+
+    /**
+     * Indicates if key sequence help has already been displayed.  If so,
+     * additional key sequence help will be displayed immediately rather than
+     * only after a delay.
+     **/
+    I.help_displayed = false;
+
+    return I;
 }
-input_stack.prototype = {
-    constructor: input_stack,
-
-    array: null,
-    help_timer: null,
-    help_displayed: false,
-
-    toString: function () {
-        return "[input_stack ("+this.array.length+")]";
-    },
-    get current () {
-        return this.array[this.array.length - 1];
-    },
-    begin_recursion: function () {
-        this.array.push(new input_state());
-    },
-    end_recursion: function () {
-        this.array.pop();
-    }
-};
-
 
 function input_help_timer_clear (window) {
-    if (window.input.help_timer != null) {
-        timer_cancel(window.input.help_timer);
-        window.input.help_timer = null;
+    var state = window.input;
+    if (state.help_timer != null) {
+        timer_cancel(state.help_timer);
+        state.help_timer = null;
     }
 }
 
 
 function input_show_partial_sequence (window, I) {
-    if (window.input.help_displayed)
-        window.minibuffer.show(I.key_sequence.join(" "));
-    else {
-        window.input.help_timer = call_after_timeout(function () {
+    var state = window.input;
+    if (I.help_displayed) {
+        if (I.key_sequence.length > 0) {
             window.minibuffer.show(I.key_sequence.join(" "));
-            window.input.help_displayed = true;
-            window.input.help_timer = null;
-        }, keyboard_key_sequence_help_timeout);
+        }
+    }
+    else {
+        if (state.help_timer != null)
+            timer_cancel(state.help_timer);
+
+        if (I.key_sequence.length > 0) {
+            state.help_timer = call_after_timeout(function () {
+                window.minibuffer.show(I.key_sequence.join(" "));
+                I.help_displayed = true;
+                state.help_timer = null;
+            }, keyboard_key_sequence_help_timeout);
+        }
     }
 }
 
@@ -153,124 +171,144 @@ function get_current_keymaps (window) {
 }
 
 
+
+// precondition: I.window.input.help_timer == null
+function input_handle_binding (I, true_event, binding) {
+
+    var window = I.window;
+    var state = window.input;
+
+    if (!binding || !binding.fallthrough)
+        event_kill(true_event);
+
+    if (!binding) {
+        window.minibuffer.message(I.key_sequence.join(" ") + " is undefined");
+        state.current_context = null;
+        return;
+    }
+
+    if (binding.browser_object !== undefined)
+        I.binding_browser_object = binding.browser_object;
+
+    if (array_p(binding)) {
+        I.keymaps = binding;
+        input_show_partial_sequence(window, I);
+        return;
+    }
+
+    // Cancel current context for now
+    // If the command is a prefix command and runs successfully, the context will be restored later
+    state.current_context = null;
+
+    if (binding.command) {
+
+        let command = binding.command;
+
+        if (I.repeat == command) {
+            // Already ran command once, run alternate command
+            command = binding.repeat;
+        }
+
+        if (binding.repeat) {
+            // Indicate that we are running command, so that next time we will run the alternate command
+            I.repeat = command;
+        }
+
+        input_run_command(I, command);
+
+    } else {
+        // Fallthrough: do nothing
+    }
+}
+
+function input_continue_with_state (I) {
+    var window = I.window;
+    var state = window.input;
+
+    if (state.current_context != null)
+        throw interactive_error("Warning: nested key sequence attempted, aborted");
+
+    state.current_context = I;
+    input_show_partial_sequence(window, I);
+}
+
+// The input system is safely re-entrant for non-prefix commands, meaning a command can itself invoke input_run_command.
+function input_run_command (I, command) {
+    var window = I.window;
+    var state = window.input;
+    co_call(function () {
+        try {
+            var is_prefix = yield run_interactively(I, command);
+
+            if (is_prefix) {
+                // reset to initial keymap
+                I.keymaps = I.initial_keymaps;
+
+                input_continue_with_state(I);
+            }
+
+        } catch (e) {
+            handle_interactive_error(window, e);
+        }
+    }());
+}
+
+
 /**
  * input_handle_sequence is the main handler for all event types which
  * can be part of a sequence.  It is a coroutine procedure which gets
  * started and resumed by various EventListeners, some of which have
  * additional, special tasks.
  */
-function input_handle_sequence (event) {
+function input_handle_event (window, event) {
     try {
-        var window = this;
-        var state = window.input.current;
-        state.continuation = yield CONTINUATION;
-        var I = new interactive_context(window.buffers.current);
-        I.key_sequence = [];
+        var state = window.input;
+        var I = state.current_context;
+        if (I == null)
+            I = state.current_context = input_make_interactive_context(window);
+        else
+            I.first_event = false;
+
+        // Clear any existing minibuffer message due to new event
+        window.minibuffer.clear();
+
+        // Reset timer because of new event
+        input_help_timer_clear(window);
+
+        // prepare the clone
+        var clone = new event_clone(event);
+        clone.sticky_modifiers = I.sticky_modifiers;
         I.sticky_modifiers = 0;
-        var keymaps = get_current_keymaps(window);
-sequence:
-        while (true) {
-            switch (event.type) {
-            case "keydown":
-                //try the fallthrough predicates in our current keymap
-                if (keymap_lookup_fallthrough(keymaps[keymaps.length - 1], event)) {
-                    //XXX: need to take account of modifers, too!
-                    state.fallthrough[event.keyCode] = true;
-                } else
-                    event_kill(event);
-                break;
-            case "keypress":
-            case "AppCommand":
-                window.minibuffer.clear();
-                window.input.help_displayed = false;
-                input_help_timer_clear(window);
-
-                // prepare the clone
-                var clone = new event_clone(event);
-                clone.sticky_modifiers = I.sticky_modifiers;
-                I.sticky_modifiers = 0;
-                if (key_bindings_ignore_capslock && clone.charCode) {
-                    let c = String.fromCharCode(clone.charCode);
-                    if (clone.shiftKey)
-                        clone.charCode = c.toUpperCase().charCodeAt(0);
-                    else
-                        clone.charCode = c.toLowerCase().charCodeAt(0);
-                }
-
-                // make the combo string
-                var combo = format_key_combo(clone);
-                var canabort = I.key_sequence.push(combo) > 1;
-                I.combo = combo;
-                I.event = clone;
-
-                // make active keymaps visible to commands
-                I.keymaps = keymaps;
-
-                if (keypress_hook.run(window, I, event))
-                    break;
-
-                var overlay_keymap = I.overlay_keymap;
-
-                var binding =
-                    (canabort && keymap_lookup([sequence_abort_keymap], combo, event)) ||
-                    (overlay_keymap && keymap_lookup([overlay_keymap], combo, event)) ||
-                    keymap_lookup(keymaps, combo, event) ||
-                    keymap_lookup([sequence_help_keymap], combo, event);
-
-                // kill event for any unbound key, or any bound key which
-                // is not marked fallthrough
-                if (!binding || !binding.fallthrough)
-                    event_kill(event);
-
-                if (binding) {
-                    if (binding.browser_object !== undefined)
-                        I.binding_browser_object = binding.browser_object;
-                    if (array_p(binding)) {
-                        keymaps = binding;
-                        input_show_partial_sequence(window, I);
-                    } else if (binding.command) {
-                        let command = binding.command;
-                        if (I.repeat == command)
-                            command = binding.repeat;
-                        yield call_interactively(I, command);
-                        if (typeof command == "string" &&
-                            interactive_commands[command].prefix)
-                        {
-                            keymaps = get_current_keymaps(window); //back to top keymap
-                            input_show_partial_sequence(window, I);
-                            if (binding.repeat)
-                                I.repeat = command;
-                        } else {
-                            break sequence;
-                        }
-                    } else {
-                        break sequence; //reachable by keypress fallthroughs
-                    }
-                } else {
-                    window.minibuffer.message(I.key_sequence.join(" ") + " is undefined");
-                    break sequence;
-                }
-                break;
-            case "command":
-                let (command = event.command) {
-                    window.input.help_displayed = false;
-                    input_help_timer_clear(window);
-                    window.minibuffer.clear();
-                    yield call_interactively(I, command);
-                    if (! interactive_commands[command].prefix)
-                        break sequence;
-                }
-                break;
-            }
-            // should we expect more events?
-            event = null;
-            event = yield SUSPEND;
+        if (key_bindings_ignore_capslock && clone.charCode) {
+            let c = String.fromCharCode(clone.charCode);
+            if (clone.shiftKey)
+                clone.charCode = c.toUpperCase().charCodeAt(0);
+            else
+                clone.charCode = c.toLowerCase().charCodeAt(0);
         }
+
+        // make the combo string
+        var combo = format_key_combo(clone);
+        I.combo = combo;
+        I.event = clone;
+
+        if (keypress_hook.run(window, I, event))
+            return;
+
+        var canabort = I.key_sequence.push(combo) > 1;
+
+
+        var overlay_keymap = I.overlay_keymap;
+
+        var binding =
+            (canabort && keymap_lookup([sequence_abort_keymap], combo, event)) ||
+            (overlay_keymap && keymap_lookup([overlay_keymap], combo, event)) ||
+            keymap_lookup(I.keymaps, combo, event) ||
+            keymap_lookup([sequence_help_keymap], combo, event);
+
+        input_handle_binding(I, event, binding);
     } catch (e) {
         dump_error(e);
-    } finally {
-        // sequence is done
-        delete state.continuation;
     }
 }
 
@@ -283,11 +321,16 @@ function input_handle_keydown (event) {
         event.keyCode == vk_name_to_keycode.caps_lock)
         return event_kill(event);
     var window = this;
-    var state = window.input.current;
-    if (state.continuation)
-        state.continuation(event);
-    else
-        co_call(input_handle_sequence.call(window, event));
+    var state = window.input;
+    var keymaps = state.current_context != null ?
+        state.current_context.keymaps : get_current_keymaps(window);
+
+    //try the fallthrough predicates in our current keymap
+    if (keymap_lookup_fallthrough(keymaps[keymaps.length - 1], event)) {
+        //XXX: need to take account of modifers, too!
+        state.fallthrough[event.keyCode] = true;
+    } else
+        event_kill(event);
 }
 
 
@@ -296,11 +339,8 @@ function input_handle_keypress (event) {
         event.keyCode == vk_name_to_keycode.caps_lock)
         return event_kill(event);
     var window = this;
-    var state = window.input.current;
-    if (state.continuation)
-        state.continuation(event);
-    else
-        co_call(input_handle_sequence.call(window, event));
+    var state = window.input;
+    input_handle_event(window, event);
 }
 
 
@@ -312,7 +352,7 @@ function input_handle_keyup (event) {
         event.keyCode == vk_name_to_keycode.caps_lock)
         return event_kill(event);
     var window = this;
-    var state = window.input.current;
+    var state = window.input;
     if (state.fallthrough[event.keyCode])
         delete state.fallthrough[event.keyCode];
     else
@@ -322,41 +362,11 @@ function input_handle_keyup (event) {
 
 function input_handle_appcommand (event) {
     var window = this;
-    var state = window.input.current;
-    if (state.continuation)
-        state.continuation(event);
-    else
-        co_call(input_handle_sequence.call(window, event));
+    input_handle_event(window, event);
 }
-
-
-// handler for command_event special events
-function input_handle_command (event) {
-    var window = this;
-    var state = window.input.current;
-    if (typeof event == 'string')
-        event = new command_event(event);
-    if (state.continuation)
-        state.continuation(event);
-    else
-        co_call(input_handle_sequence.call(window, event));
-}
-
-
-// handler for special abort event
-function input_sequence_abort (message) {
-    var window = this;
-    window.input.help_displayed = false;
-    input_help_timer_clear(window);
-    window.minibuffer.clear();
-    if (message)
-        window.minibuffer.show(message);
-    delete window.input.current.continuation;
-}
-
 
 function input_initialize_window (window) {
-    window.input = new input_stack();
+    window.input = new window_input_state();
     //window.addEventListener("keydown", input_handle_keydown, true);
     window.addEventListener("keypress", input_handle_keypress, true);
     //window.addEventListener("keyup", input_handle_keyup, true);
