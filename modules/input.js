@@ -236,7 +236,7 @@ function input_continue_with_state (I) {
 function input_run_command (I, command) {
     var window = I.window;
     var state = window.input;
-    co_call(function () {
+    spawn(function () {
         try {
             var is_prefix = yield run_interactively(I, command);
 

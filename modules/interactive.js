@@ -116,7 +116,7 @@ function run_interactively (I, command) {
 
 
 function call_interactively (I, command) {
-    co_call(function () {
+    spawn(function () {
         try {
             yield run_interactively(I, command);
         } catch (e) {
