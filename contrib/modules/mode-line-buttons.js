@@ -21,7 +21,7 @@ button_widget.prototype = {
 
         element.addEventListener("click", function (event) {
             var I = new interactive_context(window.buffers.current);
-            co_call(call_interactively(I, command));
+            call_interactively(I, command);
         }, false);
 
         element.addEventListener("mouseover", function (event) {
