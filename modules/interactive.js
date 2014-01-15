@@ -114,9 +114,14 @@ function run_interactively (I, command) {
     yield co_return(cmd.prefix ? true : false);
 }
 
-
+/**
+ * Runs the interactive command asynchronously.
+ *
+ * Returns a Promise which will be resolved (with `undefined') when
+ * the command completes.
+ **/
 function call_interactively (I, command) {
-    spawn(function () {
+    return spawn(function () {
         try {
             yield run_interactively(I, command);
         } catch (e) {
