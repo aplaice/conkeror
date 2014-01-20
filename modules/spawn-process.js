@@ -308,7 +308,7 @@ function spawn_process (program_name, args, working_dir,
         setup_timer = call_after_timeout(function () {
             setup_timer = null;
             if (control_state != CONTROL_SENT_KEY)
-                fail("setup timeout");
+                fail(new Error("spawn-process: setup timeout (check conkeror-spawn-helper)"));
         }, spawn_process_helper_setup_timeout);
 
         function wait_for_fd_sockets () {
