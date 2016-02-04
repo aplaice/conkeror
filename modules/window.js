@@ -195,6 +195,9 @@ function window_initialize (window) {
         tag = window.args.tag;
     window.tag = generate_new_window_tag(tag);
 
+    // reference to default focus element
+    window.focus_default = window.document.getElementById("focus-default");
+
     // Add a getBrowser() and content to help certain extensions designed
     // for Firefox work with conkeror
     window.getBrowser = window_get_this_browser;
