@@ -1046,6 +1046,7 @@ function unfocus (window, buffer) {
             buffer.element.focus();
             buffer.top_frame.focus();
         }
+        window.focus_default.focus();
         window.minibuffer.message("unfocused element");
         return;
     }
