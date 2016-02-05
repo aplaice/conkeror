@@ -1030,6 +1030,7 @@ function unfocus (window, buffer) {
         var active = ! sel.isCollapsed;
         var embed_p = selection_is_embed_p(sel, buffer.focused_element);
         clear_selection(buffer);
+        window.focus_default.focus();
         if (active && !embed_p) {
             window.minibuffer.message("cleared selection");
             return;
