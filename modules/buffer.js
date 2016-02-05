@@ -1060,6 +1060,7 @@ function unfocus (window, buffer) {
     // 4. return focus to top-frame from subframes and plugins.
     buffer.top_frame.focus();
     buffer.top_frame.focus(); // needed to get focus back from plugins
+    window.focus_default.focus();
     window.minibuffer.message("refocused top frame");
     // give page-modes an opportunity to set focus specially
     unfocus_hook.run(buffer);
