@@ -506,6 +506,8 @@ buffer_container.prototype = {
                 set_focus_no_scroll(this.window, saved_focused_frame);
             } catch (e) { /* saved_focused_frame may be dead */ }
         }
+
+        this.window.focus_default.focus();
     },
 
     // Note: old_value is still the current buffer when this is called
