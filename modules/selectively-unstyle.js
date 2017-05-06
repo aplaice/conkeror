@@ -15,10 +15,10 @@ define_variable('selectively_unstyle_alist', [],
 
 function selectively_unstyle (buffer) {
     var uri = buffer.current_uri.spec;
-    for each (let entry in selectively_unstyle_alist) {
+    for (let entry of selectively_unstyle_alist) {
         if (entry[0](uri)) {
             let func = entry[1];
-            for each (var sheet in buffer.document.styleSheets) {
+            for (var sheet of buffer.document.styleSheets) {
                 func(sheet);
             }
         }

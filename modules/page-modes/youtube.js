@@ -22,7 +22,7 @@ function regexp_exec (regexp, string, group) {
 function youtube_parse_video_info (info) {
     var sp = info.split("&");
     var res = {};
-    for each (var kv in sp) {
+    for (var kv of sp) {
         let [k, v] = kv.split("=");
         res[k] = decodeURIComponent(v);
     }
@@ -33,9 +33,9 @@ function youtube_parse_video_info (info) {
     var url_encoded_fmt_stream_map =
         res.url_encoded_fmt_stream_map.split(",");
     var data = [];
-    for each (var chunk in url_encoded_fmt_stream_map) {
+    for (var chunk of url_encoded_fmt_stream_map) {
         var d = {};
-        for each (kv in chunk.split("&")) {
+        for (kv of chunk.split("&")) {
             let [k, v] = kv.split("=");
             d[k] = decodeURIComponent(v);
         }
@@ -45,7 +45,7 @@ function youtube_parse_video_info (info) {
 }
 
 function youtube_get_video_info (url, id, t) {
-    for each (var el in ["profilepage", "detailpage"]) {
+    for (var el of ["profilepage", "detailpage"]) {
         var video_info_url =
             "http://www.youtube.com/get_video_info?&video_id="+
             encodeURIComponent(id)+"&el="+el+"&ps=default&eurl="+
@@ -65,7 +65,7 @@ function youtube_scrape_text (results, frame, url, id, text) {
     if (! t)
         yield co_return();
     var info = yield youtube_get_video_info(url, id, t);
-    for each (var d in info) {
+    for (var d of info) {
         var extension = mime_service.getPrimaryExtension(
             d.type, regexp_exec(/\/([^;]+)/, d.type, 1));
         results.push(load_spec({

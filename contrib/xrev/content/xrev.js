@@ -88,7 +88,7 @@ function key_event_handler (event) {
         row.appendChild(cap);
     }
 
-    for each (var k in key_event_props) {
+    for (var k in key_event_props) {
         addcell(get_field(k));
     }
     var charname = '';
@@ -109,7 +109,7 @@ function key_event_handler (event) {
     table.ensureElementIsVisible(row);
     // text output
     dump([get_field(k).toString().pad(' ',11)
-          for each (k in key_event_props)].join(''));
+          for (k of key_event_props)].join(''));
     dumpln(charname);
 }
 window.addEventListener("keydown", key_event_handler, true /* capture */);
@@ -133,11 +133,11 @@ function onload_handler () {
         coldef.appendChild(u);
     }
 
-    for each (var k in headings) {
+    for (var k of headings) {
         addcol(k);
     }
     table.appendChild(head);
     table.appendChild(coldef);
     // text output
-    dumpln([k.pad(' ',11) for each (k in headings)].join(''));
+    dumpln([k.pad(' ',11) for (k of headings)].join(''));
 }

@@ -159,7 +159,7 @@ function handle_command_line (cmdline) {
             let load_mods = new RegExp("^(" + get_pref("conkeror.loadModules") + ")$");
             try {
                 let branch = preferences.getBranch("conkeror.load.");
-                for each (let m in branch.getChildList("", {})) {
+                for (let m of branch.getChildList("", {})) {
                     let val;
                     try {
                         val = branch.getIntPref(m);

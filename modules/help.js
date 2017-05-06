@@ -168,7 +168,7 @@ describe_bindings_buffer.prototype = {
 
         var list_by_keymap = {};
         var keymap_list = [];
-        for each (let x in list) {
+        for (let x of list) {
             let name = x.bound_in || "";
             let km;
             if (name in list_by_keymap)
@@ -197,9 +197,9 @@ describe_bindings_buffer.prototype = {
 
         d.body.setAttribute("class", "help-list");
 
-        for each (let km in keymap_list) {
+        for (let km of keymap_list) {
             g.text(km.name, g.element("h1", d.body));
-            for each (let cat in km.category_list) {
+            for (let cat of km.category_list) {
                 if (cat.name != "")
                     g.text(cat.name, g.element("h2", d.body));
 

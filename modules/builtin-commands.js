@@ -175,7 +175,7 @@ function define_builtin_commands (prefix, do_command_function, mode) {
             "To toggle whether the mark is active, use `" + prefix + "set-mark'.";
     }
 
-    for each (let c_temp in builtin_commands) {
+    for (let c_temp of builtin_commands) {
         let c = c_temp;
         if (c.is_move_select_pair) {
             interactive(prefix + c.command, get_move_select_doc_string(c), function (I) {
@@ -207,7 +207,7 @@ function define_builtin_commands (prefix, do_command_function, mode) {
                     });
     }
 
-    for each (let c_temp in builtin_commands_with_count) {
+    for (let c_temp of builtin_commands_with_count) {
         let c = c_temp;
         if (c.is_reverse_pair) {
             if (c[0].is_move_select_pair) {

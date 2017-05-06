@@ -44,7 +44,7 @@
     var theme_find = function theme_find (name) {
         if (loaded_themes[name])
             return loaded_themes[name];
-        for each (var path in theme_load_paths) {
+        for (var path of theme_load_paths) {
             var url;
             if (path instanceof Ci.nsIURI) {
                 url = path.spec;
@@ -72,7 +72,7 @@
     var theme_load = function theme_load (name) {
         var th = theme_find(name);
         if (! th) throw new Error("theme "+name+" not found.");
-        for each (var cssfile in th.sheets) {
+        for (var cssfile of th.sheets) {
             let module = theme_cssfile_module(cssfile);
             if (! themes[module]) {
                 themes[module] = {};
@@ -92,7 +92,7 @@
 
     var theme_unload = function theme_unload (name) {
         var th = theme_find(name);
-        for each (var cssfile in th.sheets) {
+        for (var cssfile of th.sheets) {
             let module = theme_cssfile_module(cssfile);
             themes[module][cssfile] =
                 themes[module][cssfile].filter(function (x) { return x !== th; });

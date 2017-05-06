@@ -29,7 +29,7 @@ function media_scrape_default (buffer, results) {
         let base_uri = frame.document.documentURIObject;
 
         var uris = {};
-        for each (let x in matches) {
+        for (let x of matches) {
             let str = x;
             try {
                 let uri_obj = make_uri(str, null, base_uri);

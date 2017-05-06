@@ -516,14 +516,14 @@ var reddit_modality = {
 define_page_mode("reddit-mode",
     build_url_regexp($domain = /([a-zA-Z0-9\-]*\.)*reddit/),
     function enable (buffer) {
-        for each (var c in reddit_link_commands) {
+        for (var c of reddit_link_commands) {
             buffer.default_browser_object_classes[c] =
                 browser_object_reddit_current;
         }
         buffer.content_modalities.push(reddit_modality);
     },
     function disable (buffer) {
-        for each (var c in reddit_link_commands) {
+        for (var c of reddit_link_commands) {
             delete buffer.default_browser_object_classes[c];
         }
         var i = buffer.content_modalities.indexOf(reddit_modality);

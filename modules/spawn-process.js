@@ -324,7 +324,7 @@ function spawn_process (program_name, args, working_dir,
                     }
                 }
             }
-            for each (let f in registered_transports) {
+            for (let f of registered_transports) {
                 input_stream_async_wait(f.input, handler, false /* wait for closure */);
                 output_stream_async_wait(f.output, handler, false /* wait for closure */);
             }

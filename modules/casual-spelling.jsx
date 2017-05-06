@@ -22,7 +22,7 @@ such as accented letters and ligatures.
 function table_entry_features (entry) {
     var ret = { ligatures: false, multiples: false };
     if (typeof entry == "object") {
-        for each (var t in entry) {
+        for (var t of entry) {
             if (typeof t == "string" && t.length > 1)
                 ret.ligatures = true;
             else if (typeof t == "object") {

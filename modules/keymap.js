@@ -93,7 +93,7 @@ if (get_os() == 'Darwin') {
 
 function format_key_combo (event) {
     var combo = '';
-    for each (var M in modifier_order) {
+    for (var M of modifier_order) {
         if (modifiers[M].in_event_p(event) ||
             (event.sticky_modifiers &&
              event.sticky_modifiers.indexOf(M) != -1))
@@ -330,14 +330,14 @@ function for_each_key_binding (keymaps, callback) {
             return;
         in_keymaps.push(keymap);
         var binding;
-        for each (binding in keymap.bindings) {
+        for (binding of keymap.bindings) {
             binding_sequence.push(binding);
             callback(binding_sequence);
             if (binding.keymap)
                 helper(binding.keymap);
             binding_sequence.pop();
         }
-        for each (binding in keymap.predicate_bindings) {
+        for (binding of keymap.predicate_bindings) {
             binding_sequence.push(binding);
             callback(binding_sequence);
             if (binding.keymap)

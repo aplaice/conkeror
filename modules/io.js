@@ -220,7 +220,7 @@ function string_input_stream(data) {
 function mime_input_stream(stream, headers) {
     var mime_stream = Cc["@mozilla.org/network/mime-input-stream;1"].createInstance(Ci.nsIMIMEInputStream);
     if (headers) {
-        for each (let [name,value] in headers) {
+        for (let [name,value] of headers) {
             mime_stream.addHeader(name,value);
         }
     }

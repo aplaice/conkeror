@@ -49,7 +49,7 @@ function setObjectVisibility (document, callback) {
         className: ns.hideObjClassName
     };
     var objects = null;
-    for each (var tag in tags) {
+    for (var tag of tags) {
         var local_objects = document.getElementsByTagName(tag);
         var count = local_objects.count;
         if (count) {

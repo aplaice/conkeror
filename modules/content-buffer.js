@@ -736,7 +736,7 @@ function page_mode_update (buffer) {
         conkeror[p].disable(buffer);
     }
     var uri = buffer.current_uri;
-    for each (var name in active_page_modes) {
+    for (var name of active_page_modes) {
         var m = conkeror[name];
         m.test.some(
             function (test) {

@@ -227,7 +227,7 @@ function create_info_panel (window, panel_class, row_arr) {
     var rows = g.element("rows", grid);
     var row;
 
-    for each (let [row_class, row_label, row_value] in row_arr) {
+    for (let [row_class, row_label, row_value] of row_arr) {
         row = g.element("row", rows, "class", row_class);
         g.element("label", row,
                   "value", row_label,
@@ -267,7 +267,7 @@ function read_from_clipboard (which_clipboard) {
     var trans = Cc["@mozilla.org/widget/transferable;1"]
         .createInstance(Ci.nsITransferable);
 
-    for each (let flavor in flavors) {
+    for (let flavor of flavors) {
         trans.addDataFlavor(flavor);
     }
     clipboard.getData(trans, which_clipboard);
@@ -304,7 +304,7 @@ function read_from_x_primary_selection () {
 
 
 function predicate_alist_match (alist, key) {
-    for each (let i in alist) {
+    for (let i of alist) {
         if (i[0] instanceof RegExp) {
             if (i[0].exec(key))
                 return i[1];
@@ -467,7 +467,7 @@ function send_http_request (lspec) {
     req.open(method, load_spec_uri_string(lspec), true, arguments.$user, arguments.$password);
     req.channel.notificationCallbacks = xml_http_request_load_listener;
 
-    for each (let [name,value] in arguments.$headers) {
+    for (let [name,value] of arguments.$headers) {
         req.setRequestHeader(name, value);
     }
 

@@ -467,7 +467,7 @@ if (!use_downloads_jsm) {
                     } else
                         ids.push(id);
                 }
-                for each (let i in ids) {
+                for (let i of ids) {
                     dumpln("deleting download: " + i);
                     let d = id_to_download_info[i];
                     d.removed = true;

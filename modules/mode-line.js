@@ -120,7 +120,7 @@ text_widget.prototype = {
     update: function () {},
 
     destroy: function () {
-        for each (let i in this.window_hooks) {
+        for (let i of this.window_hooks) {
             remove_hook.call(this.window, i[0], i[1]);
         }
     },

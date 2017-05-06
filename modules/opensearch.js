@@ -258,7 +258,7 @@ opensearch_url.prototype = {
 
 function opensearch_parse (node) {
     var eng = new opensearch_description();
-    for each (let child in node.childNodes) {
+    for (let child of node.childNodes) {
         switch (child.localName) {
         case "ShortName":
             eng.name = child.textContent;
@@ -272,7 +272,7 @@ function opensearch_parse (node) {
                 let method = child.getAttribute("method") || "GET";
                 let template = child.getAttribute("template");
                 let engine_url = new opensearch_url(type, method, template);
-                for each (let p in child.childNodes) {
+                for (let p of child.childNodes) {
                     if (p.localName == "Param") {
                         let name = p.getAttribute("name");
                         let value = p.getAttribute("value");
