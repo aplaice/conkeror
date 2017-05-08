@@ -939,11 +939,15 @@ interactive("read-buffer-kill-buffer",
         var s = I.window.minibuffer.current_state;
         var i = s.selected_completion_index;
         var c = s.completions;
+        var count = c.count - 1;
         if (i == -1)
             return;
         kill_buffer(c.get_value(i));
         s.completer.refresh();
         s.handle_input(I.window.minibuffer);
+        if (count > 0) {
+            s.select_completion(count == i ? i - 1 : i);
+        }
     });
 
 interactive("bury-buffer",
