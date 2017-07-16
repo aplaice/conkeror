@@ -110,7 +110,12 @@ interactive("clear-form-history",
 
 function clear_history () {
     var PlacesUtils = Cu.import("resource://gre/modules/PlacesUtils.jsm").PlacesUtils;
-    PlacesUtils.history.removeAllPages();
+    var xulrunner_version = get_mozilla_version();
+    if (version_compare(xulrunner_version, "45.0") < 0) {
+        PlacesUtils.history.removeAllPages();
+    } else {
+        PlacesUtils.history.clear();
+    }
 }
 interactive("clear-history",
     "Permanently delete all location history.",
