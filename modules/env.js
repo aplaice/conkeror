@@ -21,7 +21,8 @@
 
 const WINDOWS = (get_os() == "WINNT");
 const POSIX = !WINDOWS;
-
+Cu.import("resource://gre/modules/FileUtils.jsm");
+const File = FileUtils.File;
 
 /**
  * get_xulrunner_version returns the version string of the running
@@ -54,18 +55,17 @@ function get_mozilla_version () {
  * home directory.
  */
 function get_home_directory () {
-    var dir = Cc["@mozilla.org/file/local;1"]
-        .createInstance(Ci.nsILocalFile);
+    // var dir = Cc["@mozilla.org/file/local;1"]
+    //     .createInstance(Ci.nsILocalFile);
     if (get_os() == "WINNT") {
         var home = getenv('HOME') ||
             getenv('USERPROFILE') ||
             getenv('HOMEDRIVE') + getenv('HOMEPATH');
         home = home.replace(/\//g, "\\");
-        dir.initWithPath(home);
+        return new File(home);
     } else {
-        dir.initWithPath(getenv('HOME'));
+        return new File(getenv('HOME'));
     }
-    return dir;
 }
 
 

@@ -800,7 +800,7 @@ define_variable("read_buffer_show_icons", false,
 
 minibuffer_auto_complete_preferences["buffer"] = true;
 define_keywords("$buffers", "$default");
-minibuffer.prototype.read_buffer = function () {
+minibuffer.prototype.read_buffer = function* () {
     var window = this.window;
     keywords(arguments, $prompt = "Buffer:",
              $buffers = function (visitor) window.buffers.for_each(visitor),
@@ -875,7 +875,7 @@ function switch_to_buffer (window, buffer) {
 }
 interactive("switch-to-buffer",
     "Prompt for a buffer and switch to it.",
-    function (I) {
+    function* (I) {
         switch_to_buffer(
             I.window,
             (yield I.minibuffer.read_buffer(
@@ -922,7 +922,7 @@ interactive("kill-buffer",
     "Kill a buffer specified in the minibuffer.\n" +
     "If `can_kill_last_buffer' is set to true, an attempt to kill the "+
     "last remaining buffer in a window will cause the window to be closed.",
-    function (I) {
+    function* (I) {
         kill_buffer((yield I.minibuffer.read_buffer($prompt = "Kill buffer:")));
     });
 
@@ -961,7 +961,7 @@ interactive("unbury-buffer",
     "With universal argument, prompt for a buffer.  When "+
     "`bury_buffer_position` is non-null, move the buffer "+
     "to the current position in the buffer list.",
-    function (I) {
+    function* (I) {
         var buffers = I.window.buffers;
         if (I.prefix_argument)
             var b = yield I.minibuffer.read_buffer(
@@ -984,7 +984,7 @@ function change_directory (buffer, dir) {
 }
 interactive("change-directory",
     "Change the current directory of the selected buffer.",
-    function (I) {
+    function* (I) {
         change_directory(
             I.buffer,
             (yield I.minibuffer.read_existing_directory_path(
@@ -993,7 +993,7 @@ interactive("change-directory",
     });
 
 interactive("shell-command", null,
-    function (I) {
+    function* (I) {
         var cwd = I.local.cwd;
         var cmd = (yield I.minibuffer.read_shell_command($cwd = cwd));
         yield shell_command(cmd, $cwd = cwd);

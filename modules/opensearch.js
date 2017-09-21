@@ -74,7 +74,7 @@ opensearch_xml_completer.prototype = {
     __proto__: completer.prototype,
     toString: function () "#<opensearch_xml_completer>",
     eng: null,
-    complete: function (input, pos) {
+    complete: function* (input, pos) {
         let str = input.substring(0, pos);
         try {
             let lspec = this.eng.get_query_load_spec(str, opensearch_response_type_xml);
@@ -111,7 +111,7 @@ opensearch_json_completer.prototype = {
     __proto__: completer.prototype,
     toString: function () "#<opensearch_json_completer>",
     eng: null,
-    complete: function (input, pos) {
+    complete: function* (input, pos) {
         let str = input.substring(0,pos);
         try {
             let lspec = this.eng.get_query_load_spec(str, opensearch_response_type_json);

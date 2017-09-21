@@ -117,7 +117,7 @@ function match_webjump (str) {
 
     // Look for a partial match
     if (! match && webjump_partial_match) {
-        for (let [k, v] in Iterator(webjumps)) {
+        for (let [k, v] in webjumps) {
             if (String(k).substring(0, key.length) == key) {
                 if (match) // prefix must be unique for a partial match
                     return [null, null, null, null];
@@ -168,7 +168,7 @@ webjump_completer.prototype = {
     toString: function () "#<webjump_completer>",
     webjump_name_completer: null,
     require_match: false,
-    complete: function (input, pos) {
+    complete: function* (input, pos) {
         this.require_match = false;
         let [w, key, sep, arg] = match_webjump(input);
         var current_part = position_in_strings([key, sep, arg], pos);

@@ -57,7 +57,7 @@ define_variable("media_scrapers",
     "(or coroutines) to use to scrape a page for embedded media.")
 
 
-function media_scrape (I, buffer) {
+function* media_scrape (I, buffer) {
     var results = [];
     for (var i = 0, nscrapers = media_scrapers.length; i < nscrapers; i++) {
         if (media_scrapers[i][0].test(buffer.current_uri.spec))
@@ -68,7 +68,7 @@ function media_scrape (I, buffer) {
 
 
 define_browser_object_class("media", null,
-    function (I, prompt) {
+    function* (I, prompt) {
         let media = yield media_scrape(I, I.buffer);
         if (!media || media.length == 0)
             throw interactive_error("No media found.");

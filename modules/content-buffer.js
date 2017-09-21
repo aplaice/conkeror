@@ -63,11 +63,6 @@ function content_buffer_modality (buffer) {
         return push_keymaps('anchor');
     if (elem instanceof Ci.nsIDOMHTMLButtonElement)
         return push_keymaps('button');
-    if (elem instanceof Ci.nsIDOMHTMLEmbedElement ||
-        elem instanceof Ci.nsIDOMHTMLObjectElement)
-    {
-        return push_keymaps('embed');
-    }
     var frame = buffer.focused_frame;
     if (frame && frame.document.designMode &&
         frame.document.designMode == "on")
@@ -389,7 +384,7 @@ define_variable("minibuffer_read_url_select_initial", true,
 
 
 minibuffer_auto_complete_preferences["url"] = true;
-minibuffer.prototype.read_url = function () {
+minibuffer.prototype.read_url = function* () {
     keywords(arguments, $prompt = "URL:", $history = "url", $initial_value = "",
              $select = minibuffer_read_url_select_initial,
              $use_webjumps = url_completion_use_webjumps,
@@ -575,7 +570,7 @@ interactive("reload",
     "If a prefix argument is specified, the cache is bypassed.  If a "+
     "DOM node is supplied via browser object, that node will be "+
     "reloaded.",
-    function (I) {
+    function* (I) {
         check_buffer(I.buffer, content_buffer);
         var element = yield read_browser_object(I);
         reload(I.buffer, I.P, element, I.forced_charset || null);

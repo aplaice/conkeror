@@ -171,7 +171,7 @@ function external_editor_make_base_filename (elem, top_doc) {
 }
 
 
-function edit_field_in_external_editor (buffer, elem, doc) {
+function* edit_field_in_external_editor (buffer, elem, doc) {
     if (! doc) {
         if (elem instanceof Ci.nsIDOMHTMLInputElement) {
             var type = (elem.getAttribute("type") || "").toLowerCase();
@@ -230,7 +230,7 @@ function edit_field_in_external_editor (buffer, elem, doc) {
 
 interactive("edit-current-field-in-external-editor",
     "Edit the contents of the currently-focused text field in an external editor.",
-    function (I) {
+    function* (I) {
         var b = I.buffer;
         var e = b.focused_element;
         var frame = b.focused_frame;

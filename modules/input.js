@@ -159,7 +159,7 @@ function get_current_keymaps (window) {
  * started and resumed by various EventListeners, some of which have
  * additional, special tasks.
  */
-function input_handle_sequence (event) {
+function* input_handle_sequence (event) {
     try {
         var window = this;
         var state = window.input.current;

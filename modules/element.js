@@ -79,7 +79,7 @@ function define_browser_object_class (name, doc, handler) {
  * `xpath_expression'.
  */
 function xpath_browser_object_handler (xpath_expression) {
-    return function (I, prompt) {
+    return function* (I, prompt) {
         var result = yield I.buffer.window.minibuffer.read_hinted_element(
             $buffer = I.buffer,
             $prompt = prompt,
@@ -95,7 +95,7 @@ define_browser_object_class("images",
 
 define_browser_object_class("frames",
     "Browser object class for selecting a frame or iframe via hinting.",
-    function (I, prompt) {
+    function* (I, prompt) {
         var doc = I.buffer.document;
         // Check for any frames or visible iframes
         var skip_hints = true;
@@ -152,7 +152,7 @@ define_browser_object_class("top",
 
 define_browser_object_class("url",
     "Browser object class which prompts the user for an url or webjump.",
-    function (I, prompt) {
+    function* (I, prompt) {
         var result = yield I.buffer.window.minibuffer.read_url($prompt = prompt);
         yield co_return(result);
     },
@@ -178,7 +178,7 @@ define_browser_object_class("paste-url",
 
 define_browser_object_class("file",
     "Browser object which prompts for a file name.",
-    function (I, prompt) {
+    function* (I, prompt) {
         var result = yield I.buffer.window.minibuffer.read_file(
             $prompt = prompt,
             $history = I.command.name+"/file",
@@ -190,7 +190,7 @@ define_browser_object_class("file",
 define_browser_object_class("alt",
     "Browser object class which returns the alt text of an html:img, "+
     "selected via hinting",
-    function (I, prompt) {
+    function* (I, prompt) {
         var result = yield I.buffer.window.minibuffer.read_hinted_element(
             $buffer = I.buffer,
             $prompt = prompt,
@@ -202,7 +202,7 @@ define_browser_object_class("alt",
 define_browser_object_class("title",
     "Browser object class which returns the title attribute of an element, "+
     "selected via hinting",
-    function (I, prompt) {
+    function* (I, prompt) {
         var result = yield I.buffer.window.minibuffer.read_hinted_element(
             $buffer = I.buffer,
             $prompt = prompt,
@@ -215,7 +215,7 @@ define_browser_object_class("title-or-alt",
     "Browser object which is the union of browser-object-alt and "+
     "browser-object-title, with title having higher precedence in "+
     "the case of an element that has both.",
-    function (I, prompt) {
+    function* (I, prompt) {
         var result = yield I.buffer.window.minibuffer.read_hinted_element(
             $buffer = I.buffer,
             $prompt = prompt,
@@ -227,7 +227,7 @@ define_browser_object_class("title-or-alt",
 define_browser_object_class("scrape-url",
     "Browser object which lets the user choose an url from a list of "+
     "urls scraped from the source code of the document.",
-    function (I, prompt) {
+    function* (I, prompt) {
         var completions = I.buffer.document.documentElement.innerHTML
             .match(/https?:[^\s<>)"]*/g)
             .filter(remove_duplicates_filter());
@@ -259,7 +259,7 @@ define_browser_object_class("dom-node", null,
 
 define_browser_object_class("fragment-link",
     "Browser object class which returns a link to the specified fragment of a page",
-    function (I, prompt) {
+    function* (I, prompt) {
         var elem = yield I.buffer.window.minibuffer.read_hinted_element(
             $buffer = I.buffer,
             $prompt = prompt,
@@ -275,7 +275,7 @@ interactive("browser-object-text",
         // set I.browser_object to a browser_object which calls the
         // original one, then returns its text.
         var b = I.browser_object;
-        I.browser_object = function (I) {
+        I.browser_object = function* (I) {
             I.browser_object = b;
             var e = yield read_browser_object(I);
             if (e instanceof Ci.nsIDOMHTMLImageElement)
@@ -314,7 +314,7 @@ function get_browser_object (I) {
     return obj;
 }
 
-function read_browser_object (I) {
+function* read_browser_object (I) {
     var browser_object = get_browser_object(I);
     if (browser_object === undefined)
         throw interactive_error("No browser object");
@@ -498,7 +498,7 @@ function dom_node_click (elem, x, y) {
 }
 
 
-function follow (I, target) {
+function* follow (I, target) {
     if (target == null)
         target = FOLLOW_DEFAULT;
     I.target = target;
@@ -513,23 +513,23 @@ function follow (I, target) {
     browser_object_follow(I.buffer, target, element);
 }
 
-function follow_new_buffer (I) {
+function* follow_new_buffer (I) {
     yield follow(I, OPEN_NEW_BUFFER);
 }
 
-function follow_new_buffer_background (I) {
+function* follow_new_buffer_background (I) {
     yield follow(I, OPEN_NEW_BUFFER_BACKGROUND);
 }
 
-function follow_new_window (I) {
+function* follow_new_window (I) {
     yield follow(I, OPEN_NEW_WINDOW);
 }
 
-function follow_current_frame (I) {
+function* follow_current_frame (I) {
     yield follow(I, FOLLOW_CURRENT_FRAME);
 }
 
-function follow_current_buffer (I) {
+function* follow_current_buffer (I) {
     yield follow(I, OPEN_CURRENT_BUFFER);
 }
 
@@ -601,7 +601,7 @@ function copy_text_message(new_text, existing_text) {
     }
 }
 
-function copy_text (I) {
+function* copy_text (I) {
     var element = yield read_browser_object(I);
     browser_set_element_focus(I.buffer, element);
     var text = browser_element_text(I.buffer, element);
@@ -609,7 +609,7 @@ function copy_text (I) {
     I.buffer.window.minibuffer.message(copy_text_message(text));
 }
 
-function copy_text_append (I) {
+function* copy_text_append (I) {
     var element = yield read_browser_object(I);
     browser_set_element_focus(I.buffer, element);
     var new_text = browser_element_text(I.buffer, element);
@@ -632,7 +632,7 @@ define_variable("view_source_function", null,
     "is considered temporary, and therefore the function must take "+
     "responsibility for deleting it.");
 
-function browser_object_view_source (buffer, target, elem) {
+function* browser_object_view_source (buffer, target, elem) {
     if (view_source_use_external_editor || view_source_function) {
         var spec = load_spec(elem);
 
@@ -675,7 +675,7 @@ function browser_object_view_source (buffer, target, elem) {
     }
 }
 
-function view_source (I, target) {
+function* view_source (I, target) {
     I.target = target;
     if (target == null)
         target = OPEN_CURRENT_BUFFER;
@@ -683,16 +683,16 @@ function view_source (I, target) {
     yield browser_object_view_source(I.buffer, target, element);
 }
 
-function view_source_new_buffer (I) {
+function* view_source_new_buffer (I) {
     yield view_source(I, OPEN_NEW_BUFFER);
 }
 
-function view_source_new_window (I) {
+function* view_source_new_window (I) {
     yield view_source(I, OPEN_NEW_WINDOW);
 }
 
 
-function browser_element_shell_command (buffer, elem, command, cwd) {
+function* browser_element_shell_command (buffer, elem, command, cwd) {
     var spec = load_spec(elem);
     yield download_as_temporary(spec,
                                 $buffer = buffer,

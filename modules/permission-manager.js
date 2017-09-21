@@ -79,7 +79,7 @@ let permission_types = {
 interactive("permission-manager", "View or edit the host-specific "
             + "permission list.\nThis list is used for the popup"
             + "blocker whitelist, among other things.",
-            function (I) {
+            function* (I) {
                 I.minibuffer.message("Save the file and close the editor when done editing permissions.");
 
                 let existing_perms = {};

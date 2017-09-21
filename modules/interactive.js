@@ -81,7 +81,7 @@ function handle_interactive_error (window, e) {
     }
 }
 
-function call_interactively (I, command) {
+function* call_interactively (I, command) {
     var handler;
     var window = I.window;
 
@@ -124,7 +124,7 @@ function call_interactively (I, command) {
 
 function alternates () {
     let alts = Array.prototype.slice.call(arguments, 0);
-    return function (I) {
+    return function* (I) {
         var index = 0;
         if (array_p(I.prefix_argument)) {
             let num = I.prefix_argument = I.prefix_argument[0];

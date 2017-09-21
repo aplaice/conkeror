@@ -115,7 +115,7 @@ file_path_completer.prototype = {
 
 
 /* keywords: $prompt, $initial_value, $history, $completer, $auto_complete */
-minibuffer.prototype.read_file_path = function () {
+minibuffer.prototype.read_file_path = function* () {
     keywords(arguments,
              $prompt = "File:",
              $initial_value = cwd.path,
@@ -128,12 +128,12 @@ minibuffer.prototype.read_file_path = function () {
     yield co_return(result);
 };
 
-minibuffer.prototype.read_file = function () {
+minibuffer.prototype.read_file = function* () {
     var result = yield this.read_file_path(forward_keywords(arguments));
     yield co_return(make_file(result));
 };
 
-minibuffer.prototype.read_existing_file = function () {
+minibuffer.prototype.read_existing_file = function* () {
     function validator (x) {
         try {
             return make_file(x).exists();
@@ -148,7 +148,7 @@ minibuffer.prototype.read_existing_file = function () {
 };
 
 //XXX: why '_path' instead of just 'read_directory' returning an nsIFile?
-minibuffer.prototype.read_directory_path = function () {
+minibuffer.prototype.read_directory_path = function* () {
     function validator (x) {
         try {
             var f = make_file(x);
@@ -165,7 +165,7 @@ minibuffer.prototype.read_directory_path = function () {
 };
 
 //XXX: why '_path' instead of just 'read_existing_directory' returning an nsIFile?
-minibuffer.prototype.read_existing_directory_path = function () {
+minibuffer.prototype.read_existing_directory_path = function* () {
     function validator (x) {
         try {
             return directory_p(make_file(x));
@@ -179,7 +179,7 @@ minibuffer.prototype.read_existing_directory_path = function () {
     yield co_return(result);
 };
 
-minibuffer.prototype.read_file_check_overwrite = function () {
+minibuffer.prototype.read_file_check_overwrite = function* () {
     keywords(arguments);
     var initial_value = arguments.$initial_value;
     do {

@@ -31,19 +31,19 @@ if (typeof(Map) == "undefined") {
     Map.prototype.clear = function (k) { this.data = {}; this.size = 0; };
 
     // Note: This does not return in insertion order.
-    Map.prototype.keys = function () {
+    Map.prototype.keys = function* () {
         for (k in this.data)
             yield k.substring(1);
     };
 
     // Note: This does not return in insertion order.
-    Map.prototype.values = function () {
+    Map.prototype.values = function* () {
         for (k in this.data)
             yield this.data[k];
     };
 
     // Note: This does not return in insertion order.
-    Map.prototype.entries = function () {
+    Map.prototype.entries = function* () {
         for (k in this.data)
             yield [k.substring(1), this.data[k]];
     };

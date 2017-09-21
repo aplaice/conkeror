@@ -159,17 +159,30 @@ function minibuffer (window) {
             s.handle_input(m);
     }
     this.input_element.addEventListener("input", dispatch_handle_input, true);
-    this.input_element.watch("value",
-        function (prop, oldval, newval) {
+    Object.defineProperty(this.input_element, "value", {
+        
+        set: function(y) {
+            (function (prop, oldval, newval) {
             if (newval != oldval &&
                 !m.ignore_input_events)
             {
                 call_after_timeout(dispatch_handle_input, 0);
             }
             return newval;
-        });
-    // Ensure that the input area will have focus if a message is
-    // currently being flashed so that the default handler for key
+            })("value",this.value, y);
+        }
+    });
+    // this.input_element.watch("value",
+    //     function (prop, oldval, newval) {
+    //         if (newval != oldval &&
+    //             !m.ignore_input_events)
+    //         {
+    //             call_after_timeout(dispatch_handle_input, 0);
+    //         }
+    //         return newval;
+    //     });
+        // Ensure that the input area will have focus if a message is
+        // currently being flashed so that the default handler for key
     // events will properly add text to the input area.
     window.addEventListener("keydown",
         function (e) {

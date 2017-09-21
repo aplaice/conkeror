@@ -36,7 +36,7 @@ define_variable("hints_display_alt", true,
  * hints_enumerate is a generator of natural numbers in the base defined
  * by hint_digits.
  */
-function hints_enumerate () {
+function* hints_enumerate () {
     var base = hint_digits.length;
     var n = [1];
     var p = 1;
@@ -727,7 +727,7 @@ interactive("hints-quote-next", null,
 
 
 define_keywords("$buffer");
-minibuffer.prototype.read_hinted_element = function () {
+minibuffer.prototype.read_hinted_element = function* () {
     keywords(arguments);
     var buf = arguments.$buffer;
     var s = new hints_minibuffer_state(this, buf, forward_keywords(arguments));

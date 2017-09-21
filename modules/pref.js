@@ -90,7 +90,8 @@ function watch_pref (pref, hook) {
     let match = pref.match(/^(.*[.])?([^.]*)$/);
     let br = match[1];
     let key = match[2];
-    let branch = preferences.getBranch(br).QueryInterface(Ci.nsIPrefBranch2);
+    // FIXME
+    let branch = preferences.getBranch(br).QueryInterface(Ci.nsIPrefBranch);
     let observer = {
         observe: function (subject, topic, data) {
             if (topic == "nsPref:changed" && data == key) {
@@ -98,7 +99,7 @@ function watch_pref (pref, hook) {
             }
         }
     };
-    branch.addObserver("", observer, false);
+    // branch.addObserver("", observer, false);
 }
 
 provide("pref");

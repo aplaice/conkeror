@@ -85,7 +85,7 @@ function make_window (initial_buffer_creator, tag) {
 function window_install_close_intercept (window) {
     var close = window.close;
     window.close = function () {
-        function attempt_close () {
+        function* attempt_close () {
             var res = yield window_before_close_hook.run(window);
             if (res) {
                 window_close_hook.run(window);

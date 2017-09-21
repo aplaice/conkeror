@@ -83,7 +83,7 @@ function document_get_element_by_relationship (doc, patterns, relationship) {
 }
 
 define_browser_object_class("relationship-next", null,
-    function (I, prompt) {
+    function* (I, prompt) {
         var doc = I.buffer.document;
         for (let frame in frame_iterator(I.buffer.top_frame, I.buffer.focused_frame)) {
             let elem = document_get_element_by_relationship(
@@ -97,7 +97,7 @@ define_browser_object_class("relationship-next", null,
     });
 
 define_browser_object_class("relationship-previous", null,
-    function (I, prompt) {
+    function* (I, prompt) {
         var doc = I.buffer.document;
         for (let frame in frame_iterator(I.buffer.top_frame, I.buffer.focused_frame)) {
             let elem = document_get_element_by_relationship(

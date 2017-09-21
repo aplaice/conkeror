@@ -64,7 +64,7 @@ content_handler_context.prototype = {
  * is able to do when Mozilla has invoked download_helper because of an
  * attempt to navigate to a document of an unsupported mime type.
  */
-function content_handler_save (ctx) {
+function* content_handler_save (ctx) {
     var suggested_path = suggest_save_path_from_file_name(
         ctx.launcher.suggestedFileName, ctx.buffer);
     var file = yield ctx.window.minibuffer.read_file_check_overwrite(
@@ -77,7 +77,7 @@ function content_handler_save (ctx) {
 
 function content_handler_save_in (path, inhibit_prompt) {
     path = make_file(path);
-    return function (ctx) {
+    return function* (ctx) {
         var file;
         var suggested_path = path.clone();
         suggested_path.append(ctx.launcher.suggestedFileName);
@@ -94,7 +94,7 @@ function content_handler_save_in (path, inhibit_prompt) {
     };
 }
 
-function content_handler_open (ctx) {
+function* content_handler_open (ctx) {
     var cwd = with_current_buffer(ctx.buffer, function (I) I.local.cwd);
     var mime_type = ctx.launcher.MIMEInfo.MIMEType;
     var suggested_action = external_content_handlers.get(mime_type);
@@ -108,7 +108,7 @@ function content_handler_open (ctx) {
     ctx.launcher.saveToDisk(file, false);
 }
 
-function content_handler_open_default_viewer (ctx) {
+function* content_handler_open_default_viewer (ctx) {
     var cwd = with_current_buffer(ctx.buffer, function (I) I.local.cwd);
     var mime_type = ctx.launcher.MIMEInfo.MIMEType;
     var command = external_content_handlers.get(mime_type);
@@ -123,7 +123,7 @@ function content_handler_open_default_viewer (ctx) {
     ctx.launcher.saveToDisk(file, false);
 }
 
-function content_handler_open_url (ctx) {
+function* content_handler_open_url (ctx) {
     ctx.abort(); // abort download
     let mime_type = ctx.launcher.MIMEInfo.MIMEType;
     let cwd = with_current_buffer(ctx.buffer, function (I) I.local.cwd);
@@ -140,7 +140,7 @@ function content_handler_copy_url (ctx) {
     ctx.window.minibuffer.message("Copied: " + uri);
 }
 
-function content_handler_view_internally (ctx) {
+function* content_handler_view_internally (ctx) {
     var suggested_type = ctx.launcher.MIMEInfo.MIMEType;
     if (viewable_mime_type_list.indexOf(suggested_type) == -1)
         suggested_type = "text/plain";
@@ -153,13 +153,13 @@ function content_handler_view_internally (ctx) {
     ctx.frame.location = ctx.launcher.source.spec; // reload
 }
 
-function content_handler_view_as_text (ctx) {
+function* content_handler_view_as_text (ctx) {
     ctx.abort(); // abort before reloading
     yield override_mime_type_for_next_load(ctx.launcher.source, "text/plain");
     ctx.frame.location = ctx.launcher.source.spec; // reload
 }
 
-function content_handler_prompt (ctx) {
+function* content_handler_prompt (ctx) {
     var action_chosen = false;
     var can_view_internally = ctx.frame != null &&
         can_override_mime_type_for_uri(ctx.launcher.source);

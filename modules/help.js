@@ -21,7 +21,7 @@ function where_is_command (buffer, command) {
         msg = command + " is on " + list.join(", ");
     buffer.window.minibuffer.message(msg);
 }
-interactive("where-is", null, function (I) {
+interactive("where-is", null, function* (I) {
     where_is_command(I.buffer,
                      (yield I.minibuffer.read_command($prompt = "Where is command:")));
 });
@@ -51,7 +51,7 @@ help_document_generator.prototype = {
                              "class", "source-code-reference",
                              "href", "javascript:");
         x.addEventListener("click", function (event) {
-            spawn(function () {
+            spawn(function* () {
                 try {
                     yield ref.open_in_editor();
                 } catch (e) {
@@ -393,13 +393,13 @@ function apropos_command (buffer, substring, target) {
                   target);
 }
 
-function apropos_command_new_buffer (I) {
+function* apropos_command_new_buffer (I) {
     apropos_command(I.buffer,
                     (yield I.minibuffer.read($prompt = "Apropos command:",
                                              $history = "apropos")),
                     OPEN_NEW_BUFFER);
 }
-function apropos_command_new_window (I) {
+function* apropos_command_new_window (I) {
     apropos_command(I.buffer,
                     (yield I.minibuffer.read($prompt = "Apropos command:",
                                              $history = "apropos")),
@@ -484,11 +484,11 @@ function describe_command (buffer, command, target) {
                                  $bindings = bindings),
                   target);
 }
-function describe_command_new_buffer (I) {
+function* describe_command_new_buffer (I) {
     describe_command(I.buffer, (yield I.minibuffer.read_command($prompt = "Describe command:")),
                      OPEN_NEW_BUFFER);
 }
-function describe_command_new_window (I) {
+function* describe_command_new_window (I) {
     describe_command(I.buffer, (yield I.minibuffer.read_command($prompt = "Describe command:")),
                      OPEN_NEW_WINDOW);
 }
@@ -497,13 +497,13 @@ interactive("describe-command", null,
 
 
 
-function view_referenced_source_code (buffer) {
+function* view_referenced_source_code (buffer) {
     if (buffer.source_code_reference == null)
         throw interactive_error("Command not valid in current buffer.");
     yield buffer.source_code_reference.open_in_editor();
 }
 interactive("view-referenced-source-code", null,
-            function (I) {yield view_referenced_source_code(I.buffer);});
+            function* (I) {yield view_referenced_source_code(I.buffer);});
 
 
 /*
@@ -615,12 +615,12 @@ function describe_key (buffer, key_info, target) {
                                  $binding = bind),
                   target);
 }
-function describe_key_new_buffer (I) {
+function* describe_key_new_buffer (I) {
     describe_key(I.buffer,
                  (yield I.minibuffer.read_key_binding($prompt = "Describe key:")),
                  OPEN_NEW_BUFFER);
 }
-function describe_key_new_window (I) {
+function* describe_key_new_window (I) {
     describe_key(I.buffer,
                  (yield I.minibuffer.read_key_binding($prompt = "Describe key:")),
                  OPEN_NEW_WINDOW);
@@ -650,7 +650,7 @@ interactive("describe-key", null,
             alternates(describe_key_new_buffer, describe_key_new_window));
 
 interactive("describe-key-briefly", null,
-    function (I) {
+    function* (I) {
         describe_key_briefly(
             I.buffer,
             (yield I.minibuffer.read_key_binding($prompt = "Describe key:")));
@@ -738,12 +738,12 @@ function describe_variable (buffer, variable, target) {
                                  $variable = variable),
                   target);
 }
-function describe_variable_new_buffer (I) {
+function* describe_variable_new_buffer (I) {
     describe_variable(I.buffer,
                       (yield I.minibuffer.read_user_variable($prompt = "Describe variable:")),
                       OPEN_NEW_BUFFER);
 }
-function describe_variable_new_window (I) {
+function* describe_variable_new_window (I) {
     describe_variable(I.buffer,
                       (yield I.minibuffer.read_user_variable($prompt = "Describe variable:")),
                       OPEN_NEW_WINDOW);
@@ -762,11 +762,11 @@ function describe_preference (buffer, preference, target) {
     let url = "http://kb.mozillazine.org/" + key;
     browser_object_follow(buffer, target, url);
 }
-function describe_preference_new_buffer (I) {
+function* describe_preference_new_buffer (I) {
     describe_preference(I.buffer, (yield I.minibuffer.read_preference($prompt = "Describe preference:")),
                         OPEN_NEW_BUFFER);
 }
-function describe_preference_new_window (I) {
+function* describe_preference_new_window (I) {
     describe_preference(I.buffer, (yield I.minibuffer.read_preference($prompt = "Describe preference:")),
                         OPEN_NEW_WINDOW);
 }

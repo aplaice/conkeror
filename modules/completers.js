@@ -388,7 +388,7 @@ merged_completer.prototype = {
     toString: function () "#<merged_completer>",
     completers: null,
     ncompleters: 0,
-    complete: function (input, pos) {
+    complete: function* (input, pos) {
         var merged_results = [];
         var count = 0;
         for (let i = 0; i < this.ncompleters; ++i) {

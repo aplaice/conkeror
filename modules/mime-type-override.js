@@ -79,7 +79,7 @@
 
     // mime_type must be a string
     var override_mime_type_for_next_load =
-        function override_mime_type_for_next_load(uri, mime_type) {
+        function* override_mime_type_for_next_load(uri, mime_type) {
             yield cache_entry_clear(CACHE_SESSION_HTTP, uri);
 
             var obj = table[uri.spec];

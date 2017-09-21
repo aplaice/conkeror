@@ -58,14 +58,14 @@ function run_hooks_until_failure (hook, args) {
     return true;
 }
 
-function run_coroutine_hooks (hook, args) {
+function* run_coroutine_hooks (hook, args) {
     if (hook == null)
         yield co_return();
     for (let i = 0, hlen = hook.length; i < hlen; ++i)
         yield hook[i].apply(null, Array.prototype.slice.call(args));
 }
 
-function run_coroutine_hooks_until_success (hook, args) {
+function* run_coroutine_hooks_until_success (hook, args) {
     if (hook == null)
         yield co_return(false);
     var result;
@@ -75,7 +75,7 @@ function run_coroutine_hooks_until_success (hook, args) {
     yield co_return(false);
 }
 
-function run_coroutine_hooks_until_failure (hook, args) {
+function* run_coroutine_hooks_until_failure (hook, args) {
     if (hook == null)
         yield co_return(true);
     for (let i = 0, hlen = hook.length; i < hlen; ++i)
@@ -136,14 +136,14 @@ function define_hook (hook_name, hook_type, doc_string) {
 
 function define_coroutine_hook (hook_name, hook_type, doc_string) {
     const prototype = {
-        RUN_HOOK: function () {
+        RUN_HOOK: function* () {
             yield run_coroutine_hooks(this, arguments);
         },
-        RUN_HOOK_UNTIL_SUCCESS: function () {
+        RUN_HOOK_UNTIL_SUCCESS: function* () {
             var result = yield run_coroutine_hooks_until_success(this, arguments);
             yield co_return(result);
         },
-        RUN_HOOK_UNTIL_FAILURE: function () {
+        RUN_HOOK_UNTIL_FAILURE: function* () {
             var result = yield run_coroutine_hooks_until_failure(this, arguments);
             yield co_return(result);
         }
@@ -183,13 +183,13 @@ function simple_local_hook_definer (extra_doc_string) {
 
 function simple_local_coroutine_hook_definer (extra_doc_string) {
     const prototype = {
-        RUN_HOOK: function (x) {
+        RUN_HOOK: function* (x) {
             var hook_name = this.hook_name;
             if (hook_name in x)
                 yield run_coroutine_hooks(x[hook_name], arguments);
             yield run_coroutine_hooks(this, arguments);
         },
-        RUN_HOOK_UNTIL_SUCCESS: function (x) {
+        RUN_HOOK_UNTIL_SUCCESS: function* (x) {
             var hook_name = this.hook_name;
             var result;
             if ((hook_name in x) &&
@@ -200,7 +200,7 @@ function simple_local_coroutine_hook_definer (extra_doc_string) {
             result = yield run_coroutine_hooks_until_success(conkeror[hook_name], arguments);
             yield co_return(result);
         },
-        RUN_HOOK_UNTIL_FAILURE: function (x) {
+        RUN_HOOK_UNTIL_FAILURE: function* (x) {
             var hook_name = this.hook_name;
             if ((hook_name in x) &&
                 !(yield run_coroutine_hooks_until_success(x[hook_name], arguments)))
@@ -255,7 +255,7 @@ function local_hook_definer (prop_name, extra_doc_string) {
 
 function local_coroutine_hook_definer (prop_name, extra_doc_string) {
     const prototype = {
-        RUN_HOOK: function (x) {
+        RUN_HOOK: function* (x) {
             var hook_name = this.hook_name;
             if (hook_name in x)
                 yield run_coroutine_hooks(x[hook_name], arguments);
@@ -263,7 +263,7 @@ function local_coroutine_hook_definer (prop_name, extra_doc_string) {
                 yield run_coroutine_hooks(x[prop_name][hook_name], arguments);
             yield run_coroutine_hooks(this, arguments);
         },
-        RUN_HOOK_UNTIL_SUCCESS: function (x) {
+        RUN_HOOK_UNTIL_SUCCESS: function* (x) {
             var hook_name = this.hook_name;
             var result;
             if ((hook_name in x) &&
@@ -279,7 +279,7 @@ function local_coroutine_hook_definer (prop_name, extra_doc_string) {
             result = yield run_coroutine_hooks_until_success(conkeror[hook_name], arguments);
             yield co_return(result);
         },
-        RUN_HOOK_UNTIL_FAILURE: function (x) {
+        RUN_HOOK_UNTIL_FAILURE: function* (x) {
             var hook_name = this.hook_name;
             if ((hook_name in x) &&
                 !(yield run_coroutine_hooks_until_success(x[hook_name], arguments)))

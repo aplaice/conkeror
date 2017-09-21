@@ -22,7 +22,7 @@ define_variable("scroll_to_heading_wrap", true,
 
 
 define_browser_object_class("next-heading", null,
-    function (I) {
+    function* (I) {
         let xpr = I.buffer.document.evaluate(
             I.local.headings_xpath, I.buffer.document, xpath_lookup_namespace,
             Ci.nsIDOMXPathResult.ORDERED_NODE_ITERATOR_TYPE, null),
@@ -50,7 +50,7 @@ define_browser_object_class("next-heading", null,
 
 
 define_browser_object_class("previous-heading", null,
-    function (I) {
+    function* (I) {
         let xpr = I.buffer.document.evaluate(
             I.local.headings_xpath, I.buffer.document,  xpath_lookup_namespace,
             Ci.nsIDOMXPathResult.ORDERED_NODE_ITERATOR_TYPE, null),
@@ -75,7 +75,7 @@ define_browser_object_class("previous-heading", null,
     });
 
 
-function scroll (I) {
+function* scroll (I) {
     var o = yield read_browser_object(I);
     // no scrolling and no error if we failed to get an object.
     if (! o)

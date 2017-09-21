@@ -27,7 +27,7 @@ define_variable("minibuffer_history_max_items", 100,
 define_variable("minibuffer_completion_rows", 8,
     "Number of minibuffer completions to display at one time.");
 
-var atom_service = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
+// var atom_service = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
 
 function completions_tree_view (minibuffer_state) {
     this.minibuffer_state = minibuffer_state;
@@ -279,7 +279,7 @@ text_entry_minibuffer_state.prototype = {
         if (is_coroutine(c)) {
             var s = this;
             var already_done = false;
-            this.completions_cont = spawn(function () {
+            this.completions_cont = spawn(function* () {
                 try {
                     var x = yield c;
                 } catch (e) {
@@ -498,13 +498,13 @@ interactive("minibuffer-history-previous", null,
     function (I) { minibuffer_history_next(I.window, -I.p); });
 
 // Define the asynchronous minibuffer.read function
-minibuffer.prototype.read = function () {
+minibuffer.prototype.read = function* () {
     var s = new text_entry_minibuffer_state(this, forward_keywords(arguments));
     this.push_state(s);
     yield co_return(yield s.promise);
 };
 
-minibuffer.prototype.read_command = function () {
+minibuffer.prototype.read_command = function* () {
     keywords(
         arguments,
         $prompt = "Command", $history = "command",
@@ -523,7 +523,7 @@ minibuffer.prototype.read_command = function () {
     yield co_return(result);
 };
 
-minibuffer.prototype.read_user_variable = function () {
+minibuffer.prototype.read_user_variable = function* () {
     keywords(
         arguments,
         $prompt = "User variable", $history = "user_variable",
@@ -540,7 +540,7 @@ minibuffer.prototype.read_user_variable = function () {
     yield co_return(result);
 };
 
-minibuffer.prototype.read_preference = function () {
+minibuffer.prototype.read_preference = function* () {
     keywords(arguments,
              $prompt = "Preference:", $history = "preference",
              $completer = new prefix_completer(
@@ -577,7 +577,7 @@ minibuffer.prototype.read_preference = function () {
 
 
 define_keywords("$object");
-minibuffer.prototype.read_object_property = function () {
+minibuffer.prototype.read_object_property = function* () {
     keywords(arguments,
              $prompt = "Property:");
     var o = arguments.$object || {};

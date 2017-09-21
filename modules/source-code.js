@@ -39,7 +39,7 @@ source_code_reference.prototype = {
         return this.uri;
     },
 
-    open_in_editor : function() {
+    open_in_editor : function*() {
         yield open_with_external_editor(load_spec(this.best_uri),
                                         $line = this.line_number);
     }

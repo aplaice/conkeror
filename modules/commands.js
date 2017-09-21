@@ -10,7 +10,7 @@
 define_coroutine_hook("before_quit_hook", RUN_HOOK_UNTIL_FAILURE);
 define_hook("quit_hook");
 
-function quit (I, restart) {
+function* quit (I, restart) {
     var res = yield before_quit_hook.run();
     if (res) {
         quit_hook.run();
@@ -27,7 +27,7 @@ interactive("quit", "Quit Conkeror", quit);
 
 interactive("restart",
     "Restart Conkeror",
-    function (I) {
+    function* (I) {
         yield quit(I, true);
     });
 
@@ -143,7 +143,7 @@ interactive("transpose-chars",
 
 interactive("execute-extended-command",
     "Call a command specified in the minibuffer.",
-    function (I) {
+    function* (I) {
         var prefix = I.P;
         var boc = I.browser_object;
         var prompt = "M-x";
@@ -282,7 +282,7 @@ function univ_arg_to_number (prefix, default_value) {
 
 interactive("eval-expression",
     "Evaluate JavaScript statements.",
-    function (I) {
+    function* (I) {
         var s = yield I.minibuffer.read(
             $prompt = "Eval:",
             $history = "eval-expression",
@@ -443,7 +443,7 @@ interactive("find-alternate-url", "Edit the current URL in the minibuffer",
     "find-url",
     $browser_object =
         define_browser_object_class("alternate-url", null,
-            function (I, prompt) {
+            function* (I, prompt) {
                 check_buffer(I.buffer, content_buffer);
                 var result = yield I.buffer.window.minibuffer.read_url(
                     $prompt = prompt,
@@ -467,7 +467,7 @@ interactive("make-window",
     $browser_object = function () { return homepage; });
 
 interactive("focus", null,
-    function (I) {
+    function* (I) {
         var element = yield read_browser_object(I);
         browser_element_focus(I.buffer, element);
     },
@@ -475,7 +475,7 @@ interactive("focus", null,
 
 interactive("save",
     "Save a browser object.",
-    function (I) {
+    function* (I) {
         var element = yield read_browser_object(I);
         var spec = load_spec(element);
         var panel;
@@ -526,7 +526,7 @@ interactive("shell-command-on-url",
     "If the given shell command contains the string '{}', the "+
     "url will be substituted in its place, otherwise the url "+
     "will be added to the end of the command.",
-    function (I) {
+    function* (I) {
         var cwd = I.local.cwd;
         var element = yield read_browser_object(I);
         var spec = load_spec(element);
@@ -551,7 +551,7 @@ interactive("shell-command-on-url",
 
 interactive("shell-command-on-file",
     "Download a document to a temporary file and run a shell command on it.",
-    function (I) {
+    function* (I) {
         var cwd = I.local.cwd;
         var element = yield read_browser_object(I);
         var spec = load_spec(element);
@@ -576,7 +576,7 @@ interactive("shell-command-on-file",
 
 interactive("bookmark",
     "Create a bookmark.",
-    function (I) {
+    function* (I) {
         var element = yield read_browser_object(I);
         var spec = load_spec(element);
         var uri_string = load_spec_uri_string(spec);
@@ -598,7 +598,7 @@ interactive("bookmark",
 interactive("save-page",
     "Save a document, not including any embedded documents such as images "+
     "and css.",
-    function (I) {
+    function* (I) {
         check_buffer(I.buffer, content_buffer);
         var element = yield read_browser_object(I);
         var spec = load_spec(element);
@@ -625,7 +625,7 @@ interactive("save-page",
 
 interactive("save-page-as-text",
     "Save a page as plain text.",
-    function (I) {
+    function* (I) {
         check_buffer(I.buffer, content_buffer);
         var element = yield read_browser_object(I);
         var spec = load_spec(element);
@@ -654,7 +654,7 @@ interactive("save-page-as-text",
 interactive("save-page-complete",
     "Save a page and all supporting documents, including images, css, "+
     "and child frame documents.",
-    function (I) {
+    function* (I) {
         check_buffer(I.buffer, content_buffer);
         var element = yield read_browser_object(I);
         var spec = load_spec(element);
@@ -685,7 +685,7 @@ interactive("save-page-complete",
     $browser_object = browser_object_frames);
 
 
-function view_as_mime_type (I, target) {
+function* view_as_mime_type (I, target) {
     I.target = target;
     var element = yield read_browser_object(I);
     var spec = load_spec(element);
@@ -717,11 +717,11 @@ function view_as_mime_type (I, target) {
     }
 }
 
-function view_as_mime_type_new_buffer (I) {
+function* view_as_mime_type_new_buffer (I) {
     yield view_as_mime_type(I, OPEN_NEW_BUFFER);
 }
 
-function view_as_mime_type_new_window (I) {
+function* view_as_mime_type_new_window (I) {
     yield view_as_mime_type(I, OPEN_NEW_WINDOW);
 }
 
@@ -735,7 +735,7 @@ interactive("view-as-mime-type",
 
 interactive("delete",
     "Delete a DOM node, given as a browser object.",
-    function (I) {
+    function* (I) {
         var elem = yield read_browser_object(I);
         if (! (elem instanceof Ci.nsIDOMNode))
             throw interactive_error("Cannot delete item");
@@ -747,7 +747,7 @@ interactive("delete",
 interactive("charset-prefix",
     "A prefix command that prompts for a charset to use in a "+
     "subsequent navigation command.",
-    function (I) {
+    function* (I) {
         var ccman = Cc["@mozilla.org/charset-converter-manager;1"]
             .getService(Ci.nsICharsetConverterManager);
         var decoders = ccman.getDecoderList()
@@ -768,7 +768,7 @@ interactive("charset-prefix",
 interactive("reload-with-charset",
     "Prompt for a charset, and reload the current page, forcing use "+
     "of that charset.",
-    function (I) {
+    function* (I) {
         var ccman = Cc["@mozilla.org/charset-converter-manager;1"]
             .getService(Ci.nsICharsetConverterManager);
         var decoders = ccman.getDecoderList()

@@ -27,7 +27,7 @@ __defineGetter__("viewable_mime_type_list",
 var category_manager = Cc["@mozilla.org/categorymanager;1"]
     .getService(Ci.nsICategoryManager);
 
-minibuffer.prototype.read_viewable_mime_type = function () {
+minibuffer.prototype.read_viewable_mime_type = function* () {
     var result = yield this.read(
         forward_keywords(arguments),
         $completer = new prefix_completer(

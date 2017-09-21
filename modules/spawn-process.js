@@ -49,7 +49,7 @@ minibuffer_auto_complete_preferences["shell-command"] = null;
 
 /* FIXME: support a relative or full path as well as PATH commands */
 define_keywords("$cwd");
-minibuffer.prototype.read_shell_command = function () {
+minibuffer.prototype.read_shell_command = function* () {
     keywords(arguments, $history = "shell-command");
     var prompt = arguments.$prompt || "Shell command [" + arguments.$cwd.path + "]:";
     var result = yield this.read(
@@ -517,7 +517,7 @@ function spawn_process_blind (program_name, args) {
 
 
 //  Keyword arguments: $cwd, $fds
-function spawn_and_wait_for_process (program_name, args) {
+function* spawn_and_wait_for_process (program_name, args) {
     keywords(arguments, $cwd = null, $fds = null);
     let result = yield spawn_process(program_name, args, arguments.$cwd,
                                      arguments.$fds);
@@ -600,7 +600,7 @@ function shell_command_with_argument_blind (command, arg) {
  * $cwd: The current working directory for the process.
  * $fds: File descriptors to use.
  */
-function shell_command (command) {
+function* shell_command (command) {
     if (!POSIX)
         throw new Error("shell_command: Your OS is not yet supported");
     var result = yield spawn_and_wait_for_process(getenv("SHELL") || "/bin/sh",
@@ -609,7 +609,7 @@ function shell_command (command) {
     yield co_return(result);
 }
 
-function shell_command_with_argument (command, arg) {
+function* shell_command_with_argument (command, arg) {
     yield co_return((yield shell_command(substitute_shell_command_argument(command, arg), forward_keywords(arguments))));
 }
 

@@ -9,7 +9,7 @@
 require("minibuffer-read.js");
 
 define_keywords("$options");
-minibuffer.prototype.read_explicit_option = function () {
+minibuffer.prototype.read_explicit_option = function* () {
     keywords(arguments);
     var options = arguments.$options;
     var options_string = or_string(options);
@@ -27,7 +27,7 @@ minibuffer.prototype.read_explicit_option = function () {
     yield co_return(result);
 };
 
-minibuffer.prototype.read_yes_or_no = function () {
+minibuffer.prototype.read_yes_or_no = function* () {
     keywords(arguments);
     var result = yield this.read_explicit_option(forward_keywords(arguments), $options = ["yes", "no"]);
     yield co_return(result == "yes");
@@ -67,7 +67,7 @@ interactive("single-character-options-enter-character", null,
                     I.event);
             });
 
-minibuffer.prototype.read_single_character_option = function () {
+minibuffer.prototype.read_single_character_option = function* () {
     keywords(arguments);
     var s = new single_character_options_minibuffer_state(this, forward_keywords(arguments));
     this.push_state(s);

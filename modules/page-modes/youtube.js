@@ -44,7 +44,7 @@ function youtube_parse_video_info (info) {
     return data;
 }
 
-function youtube_get_video_info (url, id, t) {
+function* youtube_get_video_info (url, id, t) {
     for (var el of ["profilepage", "detailpage"]) {
         var video_info_url =
             "http://www.youtube.com/get_video_info?&video_id="+
@@ -58,7 +58,7 @@ function youtube_get_video_info (url, id, t) {
     }
 }
 
-function youtube_scrape_text (results, frame, url, id, text) {
+function* youtube_scrape_text (results, frame, url, id, text) {
     var title = decodeURIComponent(regexp_exec(youtube_title_regexp, text, 1)
                                    || "video"+Date.now());
     var t = regexp_exec(youtube_t_regexp, text, 1);
@@ -79,7 +79,7 @@ function youtube_scrape_text (results, frame, url, id, text) {
     }
 }
 
-function youtube_scrape_buffer (buffer, results) {
+function* youtube_scrape_buffer (buffer, results) {
     var url = buffer.current_uri.spec;
     var id = regexp_exec(youtube_mode_test, url, 1);
     if (! id)
@@ -88,7 +88,7 @@ function youtube_scrape_buffer (buffer, results) {
     yield youtube_scrape_text(results, buffer.top_frame, url, id, text);
 }
 
-function youtube_scrape_embedded (buffer, results) {
+function* youtube_scrape_embedded (buffer, results) {
     const embedded_youtube_regexp = /^http:\/\/[a-zA-Z0-9\-.]+\.youtube\.com\/v\/([^?]*).*$/;
     for (let frame in frame_iterator(buffer.top_frame, buffer.focused_frame)) {
         // Look for embedded YouTube videos

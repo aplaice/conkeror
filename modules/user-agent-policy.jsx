@@ -43,7 +43,7 @@ function http_request_hook_function (channel) {
     try {
         var host = uri.host;
     } catch (e) {}
-    outer: for (let p of policies) {
+    outer: for (let p in policies) {
         if (host && p.byhost[host]) {
             var user_agent = p.user_agent;
             break;

@@ -113,7 +113,7 @@ download_info.prototype = {
     },
 
     // Download manager operations
-    cancel: function () {
+    cancel: function* () {
         this.throw_if_removed();
         switch (this.state) {
         case DOWNLOAD_DOWNLOADING:
@@ -134,7 +134,7 @@ download_info.prototype = {
         }
     },
 
-    retry: function () {
+    retry: function* () {
         this.throw_if_removed();
         switch (this.state) {
         case DOWNLOAD_CANCELED:
@@ -154,7 +154,7 @@ download_info.prototype = {
         }
     },
 
-    resume: function () {
+    resume: function* () {
         this.throw_if_removed();
         switch (this.state) {
         case DOWNLOAD_PAUSED:
@@ -174,7 +174,7 @@ download_info.prototype = {
         }
     },
 
-    pause: function () {
+    pause: function* () {
         this.throw_if_removed();
         switch (this.state) {
         case DOWNLOAD_DOWNLOADING:
@@ -194,7 +194,7 @@ download_info.prototype = {
         }
     },
 
-    remove: function () {
+    remove: function* () {
         this.throw_if_removed();
         switch (this.state) {
         case DOWNLOAD_FAILED:
@@ -406,7 +406,7 @@ if (!use_downloads_jsm) {
 
                         if (info.shell_command != null) {
                             info.running_shell_command = true;
-                            spawn(function () {
+                            spawn(function* () {
                                 try {
                                     yield shell_command_with_argument(info.shell_command,
                                                                       info.target_file.path,
@@ -489,7 +489,7 @@ if (!use_downloads_jsm) {
     }
 } else {
 
-    spawn(function() {
+    spawn(function*() {
         let list = yield Downloads.getList(Downloads.ALL);
         let view = {
             onDownloadAdded: function (download) {
@@ -519,7 +519,7 @@ if (!use_downloads_jsm) {
 
                         if (info.shell_command != null) {
                             info.running_shell_command = true;
-                            spawn(function () {
+                            spawn(function* () {
                                 try {
                                     yield shell_command_with_argument(info.shell_command,
                                                                       info.target_file.path,
@@ -867,7 +867,7 @@ download_buffer.prototype = {
     }
 };
 
-function download_cancel (buffer) {
+function* download_cancel (buffer) {
     check_buffer(buffer, download_buffer);
     var info = buffer.info;
     yield info.cancel();
@@ -877,7 +877,7 @@ interactive("download-cancel",
     "Cancel the current download.\n" +
     "The download can later be retried using the `download-retry' "+
     "command, but any data already transferred will be lost.",
-    function (I) {
+    function* (I) {
         let result = yield I.window.minibuffer.read_single_character_option(
             $prompt = "Cancel this download? (y/n)",
             $options = ["y", "n"]);
@@ -885,7 +885,7 @@ interactive("download-cancel",
             yield download_cancel(I.buffer);
     });
 
-function download_retry (buffer) {
+function* download_retry (buffer) {
     check_buffer(buffer, download_buffer);
     var info = buffer.info;
     yield info.retry();
@@ -896,9 +896,9 @@ interactive("download-retry",
     "This command can be used to retry a download that failed or "+
     "was canceled using the `download-cancel' command.  The download "+
     "will begin from the start again.",
-    function (I) { yield download_retry(I.buffer); });
+    function* (I) { yield download_retry(I.buffer); });
 
-function download_pause (buffer) {
+function* download_pause (buffer) {
     check_buffer(buffer, download_buffer);
     yield buffer.info.pause();
     buffer.window.minibuffer.message("Download paused");
@@ -907,9 +907,9 @@ interactive("download-pause",
     "Pause the current download.\n" +
     "The download can later be resumed using the `download-resume' command. "+
     "The data already transferred will not be lost.",
-    function (I) { yield download_pause(I.buffer); });
+    function* (I) { yield download_pause(I.buffer); });
 
-function download_resume (buffer) {
+function* download_resume (buffer) {
     check_buffer(buffer, download_buffer);
     yield buffer.info.resume();
     buffer.window.minibuffer.message("Download resumed");
@@ -918,9 +918,9 @@ interactive("download-resume",
     "Resume the current download.\n" +
     "This command can be used to resume a download paused using the "+
     "`download-pause' command.",
-    function (I) { yield download_resume(I.buffer); });
+    function* (I) { yield download_resume(I.buffer); });
 
-function download_remove (buffer) {
+function* download_remove (buffer) {
     check_buffer(buffer, download_buffer);
     yield buffer.info.remove();
     buffer.window.minibuffer.message("Download removed");
@@ -929,9 +929,9 @@ interactive("download-remove",
     "Remove the current download from the download manager.\n" +
     "This command can only be used on inactive (paused, canceled, "+
     "completed, or failed) downloads.",
-    function (I) { yield download_remove(I.buffer); });
+    function* (I) { yield download_remove(I.buffer); });
 
-function download_retry_or_resume (buffer) {
+function* download_retry_or_resume (buffer) {
     check_buffer(buffer, download_buffer);
     var info = buffer.info;
     if (info.state == DOWNLOAD_PAUSED)
@@ -944,9 +944,9 @@ interactive("download-retry-or-resume",
     "This command can be used to resume a download paused using the " +
     "`download-pause' command or canceled using the `download-cancel' "+
     "command.",
-    function (I) { yield download_retry_or_resume(I.buffer); });
+    function* (I) { yield download_retry_or_resume(I.buffer); });
 
-function download_pause_or_resume (buffer) {
+function* download_pause_or_resume (buffer) {
     check_buffer(buffer, download_buffer);
     var info = buffer.info;
     if (info.state == DOWNLOAD_PAUSED)
@@ -957,7 +957,7 @@ function download_pause_or_resume (buffer) {
 interactive("download-pause-or-resume",
     "Pause or resume the current download.\n" +
     "This command toggles the paused state of the current download.",
-    function (I) { yield download_pause_or_resume(I.buffer); });
+    function* (I) { yield download_pause_or_resume(I.buffer); });
 
 function download_delete_target (buffer) {
     check_buffer(buffer, download_buffer);
@@ -993,7 +993,7 @@ interactive("download-shell-command",
     "Run a shell command on the target file of the current download.\n"+
     "If the download is still in progress, the shell command will be queued "+
     "to run when the download finishes.",
-    function (I) {
+    function* (I) {
         var buffer = check_buffer(I.buffer, download_buffer);
         var cwd = buffer.info.shell_command_cwd || I.local.cwd;
         var cmd = yield I.minibuffer.read_shell_command(
@@ -1072,7 +1072,7 @@ download_completer.prototype = {
     toString: function () "#<download_completer>"
 };
 
-minibuffer.prototype.read_download = function () {
+minibuffer.prototype.read_download = function* () {
     keywords(arguments,
              $prompt = "Download",
              $auto_complete = "download",
@@ -1102,17 +1102,17 @@ function download_show (window, target, mozilla_info) {
     create_buffer(window, buffer_creator(download_buffer, $info = info), target);
 }
 
-function download_show_new_window (I) {
+function* download_show_new_window (I) {
     var mozilla_info = yield I.minibuffer.read_download($prompt = "Show download:");
     download_show(I.window, OPEN_NEW_WINDOW, mozilla_info);
 }
 
-function download_show_new_buffer (I) {
+function* download_show_new_buffer (I) {
     var mozilla_info = yield I.minibuffer.read_download($prompt = "Show download:");
     download_show(I.window, OPEN_NEW_BUFFER, mozilla_info);
 }
 
-function download_show_new_buffer_background (I) {
+function* download_show_new_buffer_background (I) {
     var mozilla_info = yield I.minibuffer.read_download($prompt = "Show download:");
     download_show(I.window, OPEN_NEW_BUFFER_BACKGROUND, mozilla_info);
 }

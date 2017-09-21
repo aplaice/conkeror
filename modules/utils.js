@@ -27,7 +27,8 @@ function makeURLAbsolute (base, url) {
 
 
 function make_file (path) {
-    if (path instanceof Ci.nsILocalFile) {
+    // FIXME
+    if (path instanceof Ci.nsIFile) {
         return path;
     }
     if (path == "~") {
@@ -359,7 +360,7 @@ function for_each_frame (win, callback) {
     }
 }
 
-function frame_iterator (root_frame, start_with) {
+function* frame_iterator (root_frame, start_with) {
     var q = new queue, x;
     if (start_with) {
         x = start_with;
@@ -521,7 +522,8 @@ function compute_up_url (uri) {
 function url_path_trim (url) {
     var uri = make_uri(url);
     uri.spec = url;
-    uri.path = "";
+    // TODO temporarily commenting this to fix yield problem
+    // uri.path = "";
     return uri.spec;
 }
 

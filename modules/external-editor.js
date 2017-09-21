@@ -28,7 +28,7 @@ define_variable("run_external_editor_function", null,
     "for use as the value of this variable.");
 
 define_keyword("$temporary", "$line");
-function open_file_with_external_editor (file) {
+function* open_file_with_external_editor (file) {
     keywords(arguments);
 
     if (run_external_editor_function) {
@@ -55,7 +55,7 @@ function open_file_with_external_editor (file) {
 }
 
 function create_external_editor_launcher (program, args) {
-    return function (file) {
+    return function* (file) {
         keywords(arguments);
         var arr = [null].concat(args.slice());
         if (arguments.$line != null)
@@ -73,7 +73,7 @@ function create_external_editor_launcher (program, args) {
     };
 }
 
-function open_with_external_editor (lspec) {
+function* open_with_external_editor (lspec) {
     keywords(arguments);
     let [file, temp] = yield download_as_temporary(lspec);
     yield open_file_with_external_editor(file, $line = arguments.$line, $temporary = temp);
