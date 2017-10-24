@@ -12,7 +12,7 @@ Vcs-Git: git://repo.or.cz/conkeror.git
 Package: conkeror
 Architecture: all
 Depends: ${misc:Depends},
-         firefox | firefox-esr | iceweasel
+         firefox (<< 57~) | firefox-esr (<< 57~) | iceweasel (<< 57~)
 Recommends: conkeror-spawn-process-helper,
             xdg-utils
 Breaks: conkeror-spawn-process-helper (<< 0.9~git080901-1)
