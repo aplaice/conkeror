@@ -16,8 +16,10 @@ plugins
 /debian/conkeror*.debhelper
 /debian/conkeror-spawn-process-helper/
 /debian/conkeror/
+/debian/debhelper-build-stamp
 /debian/files
 /debian/stamp-patched
 /debian/tmp/
+/debian/.debhelper/
 /xulrunner
 /conkeror-bin

@@ -1,4 +1,4 @@
-conkeror (1.0.3+git170508-1) UNRELEASED; urgency=medium
+conkeror (1.0.3+git171024-1) UNRELEASED; urgency=medium
 
   * New upstream snapshot.
   * Restrict dependencies on Firefox variants to versions below 57.
