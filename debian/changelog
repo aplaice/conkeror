@@ -1,4 +1,4 @@
-conkeror (1.0.3+git171024-1) UNRELEASED; urgency=medium
+conkeror (1.0.3+git171024-1) unstable; urgency=medium
 
   * New upstream snapshot.
   * Restrict dependencies on Firefox variants to versions below 57.
@@ -9,7 +9,7 @@ conkeror (1.0.3+git171024-1) UNRELEASED; urgency=medium
   * Switch to debhelper compatibility level 10.
     + Bump versioned debhelper build-dependency accordingly.
 
- -- Axel Beckert <abe@debian.org>  Tue, 24 Oct 2017 22:01:20 +0200
+ -- Axel Beckert <abe@debian.org>  Tue, 24 Oct 2017 23:16:02 +0200
 
 conkeror (1.0.3+git170123-1) unstable; urgency=medium
 
