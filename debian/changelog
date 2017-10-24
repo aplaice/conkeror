@@ -2,6 +2,7 @@ conkeror (1.0.3+git170508-1) UNRELEASED; urgency=medium
 
   * New upstream snapshot.
   * Restrict dependencies on Firefox variants to versions below 57.
+  * debian/rules: Use pkg-info.mk instead of parsing debian/changelog.
 
  -- Axel Beckert <abe@debian.org>  Tue, 24 Oct 2017 22:01:20 +0200
 
