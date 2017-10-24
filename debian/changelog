@@ -6,6 +6,8 @@ conkeror (1.0.3+git171024-1) UNRELEASED; urgency=medium
   * Declare compliance with Debian Policy 4.1.1.
     + Change Priority from extra to optional.
     + Use HTTPS in debian/copyright format URL.
+  * Switch to debhelper compatibility level 10.
+    + Bump versioned debhelper build-dependency accordingly.
 
  -- Axel Beckert <abe@debian.org>  Tue, 24 Oct 2017 22:01:20 +0200
 
