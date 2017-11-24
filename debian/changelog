@@ -1,6 +1,8 @@
-conkeror (1.0.3+git171024-2) UNRELEASED; urgency=medium
+conkeror (1.0.3+git171024-2) UNRELEASED; urgency=high
 
   * Set "Rules-Requires-Root: no".
+  * Prefer firefox-esr and iceweasel over firefox to not try running FF ≥
+    57 if both, firefox and firefox-esr are installed.
 
  -- Axel Beckert <abe@debian.org>  Wed, 01 Nov 2017 05:07:09 +0100
 
