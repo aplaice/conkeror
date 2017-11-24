@@ -1,10 +1,11 @@
-conkeror (1.0.3+git171024-2) UNRELEASED; urgency=high
+conkeror (1.0.3+git171024-2) unstable; urgency=high
 
+  * The deathbed upload.
   * Set "Rules-Requires-Root: no".
   * Prefer firefox-esr and iceweasel over firefox to not try running FF ≥
     57 if both, firefox and firefox-esr are installed.
 
- -- Axel Beckert <abe@debian.org>  Wed, 01 Nov 2017 05:07:09 +0100
+ -- Axel Beckert <abe@debian.org>  Sat, 25 Nov 2017 00:35:45 +0100
 
 conkeror (1.0.3+git171024-1) unstable; urgency=medium
 
