@@ -1,4 +1,4 @@
-conkeror (1.0.3+git171129-1) UNRELEASED; urgency=medium
+conkeror (1.0.4-1) UNRELEASED; urgency=medium
 
   * New upstream snapshot.
     + Fixes HTTP Basic Auth issues since Firefox 52. (Closes: #859364)
