@@ -1,11 +1,11 @@
-conkeror (1.0.4-1) UNRELEASED; urgency=medium
+conkeror (1.0.4-1) unstable; urgency=medium
 
   * New upstream snapshot.
     + Fixes HTTP Basic Auth issues since Firefox 52. (Closes: #859364)
   * Add lintian override for bogus tech-ctte decision imposed onto policy,
     as the less bad of all alternatives.
 
- -- Axel Beckert <abe@debian.org>  Wed, 29 Nov 2017 18:31:44 +0100
+ -- Axel Beckert <abe@debian.org>  Wed, 29 Nov 2017 20:39:08 +0100
 
 conkeror (1.0.3+git171024-2) unstable; urgency=high
 
