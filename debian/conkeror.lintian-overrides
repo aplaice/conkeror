@@ -1,3 +1,6 @@
 # Non-standard Xul-AppId header needed for mozilla-devscripts (see bug
 # #562986 and http://wiki.debian.org/mozilla-devscripts)
 conkeror binary: unknown-field-in-control xul-appid
+
+# Ignore bogus tech-ctte decision imposed onto policy.
+conkeror: command-in-menu-file-and-desktop-file conkeror usr/share/menu/conkeror:*
