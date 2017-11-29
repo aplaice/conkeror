@@ -1,3 +1,10 @@
+conkeror (1.0.3+git171129-1) UNRELEASED; urgency=medium
+
+  * New upstream snapshot.
+    + Fixes HTTP Basic Auth issues since Firefox 52. (Closes: #859364)
+
+ -- Axel Beckert <abe@debian.org>  Wed, 29 Nov 2017 18:31:44 +0100
+
 conkeror (1.0.3+git171024-2) unstable; urgency=high
 
   * The deathbed upload.
