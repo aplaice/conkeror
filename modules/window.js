@@ -181,6 +181,18 @@ function window_get_this_browser () {
     return this.buffers.current.browser;
 }
 
+function gbrowser(win) {
+    this.win=win;
+}
+
+gbrowser.prototype = {
+    constructor: gbrowser,
+    toString: function () "#<gbrowser>",
+    getBrowserForContentWindow: function (win) {
+        return this.win.buffers.current.browser;
+    }
+}
+
 function window_initialize (window) {
     window.conkeror = conkeror;
 
@@ -198,6 +210,8 @@ function window_initialize (window) {
     // Add a getBrowser() and content to help certain extensions designed
     // for Firefox work with conkeror
     window.getBrowser = window_get_this_browser;
+    window.gBrowser = new gbrowser(window);
+
     window.__defineGetter__('content',
                             function () {
                                 return this.buffers.current.browser.contentWindow;
