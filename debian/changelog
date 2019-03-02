@@ -6,6 +6,7 @@ conkeror (1.0.4-2) UNRELEASED; urgency=medium
   * Add missing dependency on sensible-utils.
   * Use HTTPS for Vcs-* headers, debian/watch and debian/copyright Source.
     + Drop according lintian overrides.
+  * Declare compliance with Debian Policy 4.3.0. (No changes needed.)
 
  -- Axel Beckert <abe@debian.org>  Sat, 02 Mar 2019 15:39:03 +0100
 

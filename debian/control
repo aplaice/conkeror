@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Axel Beckert <abe@debian.org>
 Build-Depends: debhelper (>= 10),
                dpkg-dev (>= 1.16.1~)
-Standards-Version: 4.1.1
+Standards-Version: 4.3.0
 Homepage: http://conkeror.org/
 Vcs-Browser: https://repo.or.cz/w/conkeror.git
 Vcs-Git: https://repo.or.cz/conkeror.git
