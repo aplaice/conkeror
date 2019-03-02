@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: Conkeror (with a C)
 Upstream-Contact: conkeror@librelist.com
-Source: http://repo.or.cz/w/conkeror.git
+Source: https://repo.or.cz/w/conkeror.git
         http://conkeror.org/
 
 Files: *
