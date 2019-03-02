@@ -1,5 +1,5 @@
 Description: Adds and enables some Debian and Ubuntu related webjumps
- They're not suitable for being inlcuded in upstream by default.
+ They're not suitable for being included in upstream by default.
 Forwarded: not-needed
 Author: Axel Beckert <abe@debian.org>
 
