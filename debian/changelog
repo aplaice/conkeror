@@ -1,3 +1,10 @@
+conkeror (1.0.4-2) UNRELEASED; urgency=medium
+
+  * Support waterfox as alternative to old firefoxes and iceweasels.
+    + Prefer waterfox over firefox.
+
+ -- Axel Beckert <abe@debian.org>  Sat, 02 Mar 2019 15:39:03 +0100
+
 conkeror (1.0.4-1) unstable; urgency=medium
 
   * New upstream snapshot.

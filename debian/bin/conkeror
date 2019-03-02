@@ -10,7 +10,9 @@ export XUL_APP_FILE
 XULRUNNER=''
 
 # *sigh* No more xulrunner since iceweasel 30
-if [ -x /usr/bin/firefox-esr ]; then
+if [ -x /usr/bin/waterfox ]; then
+    XULRUNNER="/usr/bin/waterfox"
+elif [ -x /usr/bin/firefox-esr ]; then
     XULRUNNER="/usr/bin/firefox-esr"
 elif [ -x /usr/bin/iceweasel ]; then
     XULRUNNER="/usr/bin/iceweasel"
@@ -19,7 +21,7 @@ elif [ -x /usr/bin/firefox ]; then
 fi
 
 if [ -z "$XULRUNNER" ]; then
-    echo "No Firefox or Iceweasel found. Bailing out." 1>&2
+    echo "No Waterfox or Firefox or Iceweasel found. Bailing out." 1>&2
     exit 1;
 fi
 
