@@ -330,7 +330,9 @@ function for_each_key_binding (keymaps, callback) {
             return;
         in_keymaps.push(keymap);
         var binding;
-        for (binding of keymap.bindings) {
+        // TERMINOLOGY? key
+        for (let key in keymap.bindings) {
+            binding = keymap.bindings[key];
             binding_sequence.push(binding);
             callback(binding_sequence);
             if (binding.keymap)
