@@ -159,28 +159,20 @@ function minibuffer (window) {
             s.handle_input(m);
     }
     this.input_element.addEventListener("input", dispatch_handle_input, true);
-    Object.defineProperty(this.input_element, "value", {
-        
-        set: function(y) {
-            (function (prop, oldval, newval) {
+    Object.defineProperty(this.input_element, "_value", {
+        set: function (newval) {
+            let oldval = this.value;
             if (newval != oldval &&
                 !m.ignore_input_events)
             {
                 call_after_timeout(dispatch_handle_input, 0);
             }
-            return newval;
-            })("value",this.value, y);
+            this.value = newval;
+        },
+        get: function () {
+            return this.value;
         }
     });
-    // this.input_element.watch("value",
-    //     function (prop, oldval, newval) {
-    //         if (newval != oldval &&
-    //             !m.ignore_input_events)
-    //         {
-    //             call_after_timeout(dispatch_handle_input, 0);
-    //         }
-    //         return newval;
-    //     });
         // Ensure that the input area will have focus if a message is
         // currently being flashed so that the default handler for key
     // events will properly add text to the input area.
@@ -199,8 +191,8 @@ minibuffer.prototype = {
 
     get _selection_start () { return this.input_element.selectionStart; },
     get _selection_end () { return this.input_element.selectionEnd; },
-    get _input_text () { return this.input_element.value; },
-    set _input_text (text) { this.input_element.value = text; },
+    get _input_text () { return this.input_element._value; },
+    set _input_text (text) { this.input_element._value = text; },
     get prompt () { return this.input_prompt_element.value; },
     set prompt (s) { this.input_prompt_element.value = s; },
 
