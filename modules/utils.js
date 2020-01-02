@@ -360,7 +360,7 @@ function for_each_frame (win, callback) {
     }
 }
 
-function* frame_iterator (root_frame, start_with) {
+function frame_iterator (root_frame, start_with) {
     var q = new queue, x;
     if (start_with) {
         x = start_with;

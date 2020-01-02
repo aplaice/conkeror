@@ -622,7 +622,7 @@ interactive("read-key-binding-key",
                               I.event);
      });
 
-minibuffer.prototype.read_key_binding = function* () {
+minibuffer.prototype.read_key_binding = function () {
     keywords(arguments);
     var s = new key_binding_reader(this, forward_keywords(arguments));
     this.push_state(s);

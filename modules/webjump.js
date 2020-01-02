@@ -168,7 +168,7 @@ webjump_completer.prototype = {
     toString: function () "#<webjump_completer>",
     webjump_name_completer: null,
     require_match: false,
-    complete: function* (input, pos) {
+    complete: function (input, pos) {
         this.require_match = false;
         let [w, key, sep, arg] = match_webjump(input);
         var current_part = position_in_strings([key, sep, arg], pos);
