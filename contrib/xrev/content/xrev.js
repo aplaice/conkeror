@@ -88,7 +88,7 @@ function key_event_handler (event) {
         row.appendChild(cap);
     }
 
-    for (var k in key_event_props) {
+    for (var k of key_event_props) {
         addcell(get_field(k));
     }
     var charname = '';

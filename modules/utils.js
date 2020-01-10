@@ -468,8 +468,10 @@ function send_http_request (lspec) {
     req.open(method, load_spec_uri_string(lspec), true, arguments.$user, arguments.$password);
     req.channel.notificationCallbacks = xml_http_request_load_listener;
 
-    for (let [name,value] of arguments.$headers) {
-        req.setRequestHeader(name, value);
+    if (arguments.$headers) {
+        for (let [name,value] of arguments.$headers) {
+            req.setRequestHeader(name, value);
+        }
     }
 
     if (post_data) {
