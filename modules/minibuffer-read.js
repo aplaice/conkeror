@@ -27,8 +27,6 @@ define_variable("minibuffer_history_max_items", 100,
 define_variable("minibuffer_completion_rows", 8,
     "Number of minibuffer completions to display at one time.");
 
-// var atom_service = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
-
 function completions_tree_view (minibuffer_state) {
     this.minibuffer_state = minibuffer_state;
 }
@@ -64,14 +62,11 @@ completions_tree_view.prototype = {
         return null;
     },
     getRowProperties: function (row, props) {},
-    getCellProperties: function (row, col, props) {
+    getCellProperties: function (row, col) {
         if (col.index == 0)
-            var a = atom_service.getAtom("completion-string");
+            return "completion-string";
         else
-            a = atom_service.getAtom("completion-description");
-        if (props)
-            props.AppendElement(a);
-        return a;
+            return "completion-description";
     },
     getColumnProperties: function (colid, col, props) {}
 };
